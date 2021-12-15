@@ -1,7 +1,5 @@
 #
 import sys
-from ase_interface import ANIENS
-from ase_interface import aniensloader
 
 import  ase
 import time
@@ -19,12 +17,21 @@ import numpy  as np
 import argparse
 
 from aniqm_utils import prepare_xyz_grp, prepare_xyz_complex, pdb2xyz
+import torchani
+
+import torch
+print("Nuber of CUDA devices: ", torch.cuda.device_count())
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
 
 parser = argparse.ArgumentParser(description="Give something ...")
 parser.add_argument("-aniDIR", "--aniDIR",
                     type=str, required=True,
                     help="")
 parser.add_argument("-calcMode", "--calcMode",
+                    type=str, required=True,
+                    help="")
+parser.add_argument("-model_list", "--model_list", nargs='+', default=[],
                     type=str, required=True,
                     help="")
 parser.add_argument("-struct_dir", "--struct_dir",
@@ -56,45 +63,49 @@ parser.add_argument("-thr_fmax", "--thr_fmax",
                     help="")
 
 
-args = parser.parse_args()
-# set envs
-aniDIR = args.aniDIR
-model_anix_path = '%s/ani_models/ani-1x_8x.info' %aniDIR
-model_aniccx_path = '%s/ani_models/ani-1ccx_8x.info' %aniDIR
-model_ani2x_path = '%s/ani_models/ani-2x_8x.info' %aniDIR
+def calcSPWithAni(calculator, mol):
 
-def calcSPWithAni(model_path, traj_path, mol):
+    mol.set_calculator(calculator)
 
-    # mol_path = structure_dir + "/" + file_base + ".xyz"
+    # check atom type for ani2x
+    #  atom_types = mol.get_chemical_symbols()
+    #  ani2_atom_type = [sym for sym in atom_types if sym in ["Cl", "F", "S"]]
+    #  if len(ani2_atom_type) >= 1:
+    #      return 0.0
 
-    # check .xyz structure file
-    #if not os.path.exists(mol_path):
-    #    pdb2xyz(structure_dir, file_base)
+    try:
+        return np.round(mol.get_potential_energy(), 8)
+    except:
+        return 0.0
 
-    # Read molecule from xyz
-    # mol = read(mol_path)
-    # set calculator
-    mol.set_calculator(ANIENS(aniensloader(model_path, 0)))
 
-    start_time = time.time()
+def load_models(model_names):
+    # model_list
+    ani1x = torchani.models.ANI1x().to(device).ase()
+    ani1ccx = torchani.models.ANI1ccx().to(device).ase()
+    ani2x = torchani.models.ANI2x().to(device).ase()
+    models = {"ani1x": ani1x, "ani1ccx": ani1ccx, "ani2x": ani2x}
 
-    # Calculate energy
-    ef = mol.get_potential_energy()
-    run_time = time.time() - start_time
-    return float("%.8f"%ef)
+    return {key: models[key] for key in model_names}
+
+
+def get_diff(model_data):
+    return [model_data[0] - model_data[1] - model_data[2]]
+
 
 def runSPgroupedMultiMol(grp1, grp2, directory, base, seq_start, seq_end):
-    list_results = []
     structure_dir = directory
-    traj_path =  "%s/traj_files" %structure_dir
-    
-    if not os.path.exists(traj_path):
-        traj_path = os.mkdir(traj_path)
+    labels = ["Structure"]
 
-    labels = ["Structure", "SPE_anix_%s_%s"%(grp1, grp2), "SPE_anix_%s"%grp1, "SPE_anix_%s"%grp2,
-              "SPE_aniccx_%s_%s"%(grp1, grp2), "SPE_aniccx_%s"%grp1, "SPE_aniccx_%s"%grp2,
-              "SPE_ani2x_%s_%s"%(grp1, grp2), "SPE_ani2x_%s"%grp1, "SPE_ani2x_%s"%grp2,
-              "diff_anix", "diff_aniccx", "diff_ani2x"]
+    for model_name in model_names:
+        labels +=  ["SPE_%s_%s_%s"%(model_name, grp1, grp2),
+                   "SPE_%s_%s"%(model_name, grp1),
+                   "SPE_%s_%s"%(model_name, grp2), "diff_%s" %model_name]
+    #  labels = ["Structure"] +  ["SPE_anix_%s_%s"%(grp1, grp2), "SPE_anix_%s"%grp1, "SPE_anix_%s"%grp2,
+    #            "SPE_aniccx_%s_%s"%(grp1, grp2), "SPE_aniccx_%s"%grp1, "SPE_aniccx_%s"%grp2,
+    #            "SPE_ani2x_%s_%s"%(grp1, grp2), "SPE_ani2x_%s"%grp1, "SPE_ani2x_%s"%grp2,
+    #            "diff_anix", "diff_aniccx", "diff_ani2x"]
+
     df_results = pd.DataFrame(columns=labels)
     df_results.to_csv("%s/%s_SP_energies.csv" %(structure_dir, base))
 
@@ -104,245 +115,42 @@ def runSPgroupedMultiMol(grp1, grp2, directory, base, seq_start, seq_end):
         prepare_xyz_complex(structure_dir, file_base, grp1, grp2)
         mol_path = structure_dir + "/" + file_base + ".xyz"
         mol = read(mol_path)
-        atom_types = mol.get_chemical_symbols()
 
-        list_results_anix = [str(file_base)]
-        list_results_aniccx = []
-        list_results_ani2x = []
-        #i += 1
+        data = {model_name: [] for model_name in model_names}
         print("%d. pdb file is processing ..." %i)
         #file_base = file_name.replace(".pdb", "").replace(".xyz", "")
         print("Calcultion starts for %s" %file_base)
 
-        # check atom type for ani2x
-        ani2_atom_type = [sym for sym in atom_types if sym in ["Cl", "F", "S"]]
-
-        if len(ani2_atom_type) >= 1:
-            results_anix = 0
-            results_aniccx = 0
-            results_ani2x = calcSPWithAni(model_ani2x_path, traj_path, mol)
-        else:
-            results_anix = calcSPWithAni(model_anix_path, traj_path, mol)
-            results_aniccx = calcSPWithAni(model_aniccx_path, traj_path, mol)
-            results_ani2x = calcSPWithAni(model_ani2x_path, traj_path, mol)
-        list_results_anix.append(results_anix)
-        list_results_aniccx.append(results_aniccx)
-        list_results_ani2x.append(results_ani2x)
-
-        for grp in [grp1, grp2]:
-            prepare_xyz_grp(grp, structure_dir, file_base)
-            file_base_new = "{}_{}".format(file_base, grp)
-            mol_path = structure_dir + "/" + file_base_new + ".xyz"
-            mol = read(mol_path)
-            if len(ani2_atom_type) >= 1:
-                results_anix = 0
-                results_aniccx = 0
-                results_ani2x = calcSPWithAni(model_ani2x_path, traj_path, mol)
+        j = 0
+        for model_name, model in load_models(model_names).items():
+            result = calcSPWithAni(model, mol)
+            data[f"{model_name}"].append(calcSPWithAni(model, mol))
+            if result == 0.0:
+                for grp in [grp1, grp2]:
+                    data[f"{model_name}"].append(result)
+                continue
             else:
-                results_anix = calcSPWithAni(model_anix_path, traj_path, mol)
-                results_aniccx = calcSPWithAni(model_aniccx_path, traj_path, mol)
-                results_ani2x = calcSPWithAni(model_ani2x_path, traj_path, mol)
-            list_results_anix.append(results_anix)
-            list_results_aniccx.append(results_aniccx)
-            list_results_ani2x.append(results_ani2x)
-        list_results = list_results_anix + list_results_aniccx + list_results_ani2x\
-                + [list_results_anix[1] - list_results_anix[2] - list_results_anix[3]] \
-                + [list_results_aniccx[0] - list_results_aniccx[1] - list_results_aniccx[2]] \
-                + [list_results_ani2x[0] - list_results_ani2x[1] - list_results_ani2x[2]]
-            #print(list_results)
-        #  except:
-        #      print("Error for {}\nSkipping...\n".format(file_base))
-        #      list_results = np.zeros(len(labels))
-        #      list_results[0] = str(file_base)
-        #print(list_results)
+                for grp in [grp1, grp2]:
+                    if j == 0:
+                        prepare_xyz_grp(grp, structure_dir, file_base)
+                        file_base_new = "{}_{}".format(file_base, grp)
+                        mol_path = structure_dir + "/" + file_base_new + ".xyz"
+                        mol = read(mol_path)
+                    data[f"{model_name}"].append(calcSPWithAni(model, mol))
+            j += 1
+
+        list_results = [file_base]
+        for model_name in model_names:
+            model_data = data[model_name]
+            list_results += model_data
+            list_results += get_diff(model_data)
         df_results = pd.DataFrame([list_results], columns=labels)
         df_results.to_csv("%s/%s_SP_energies.csv" %(structure_dir, base), mode="a", header=False)
 
-def runSPmultiMol(directory, base, seq_start, seq_end):
-    list_results = []
-    structure_dir = directory
-    traj_path =  "%s/traj_files" %structure_dir
 
-    if not os.path.exists(traj_path):
-        traj_path = os.mkdir(traj_path)
-
-    labels = ["Structure", "SPE_anix", "SPE_aniccx", "SPE_ani2x"]
-    df_results = pd.DataFrame(columns=labels)
-    df_results.to_csv("%s/%s_SP_energies.csv" %(structure_dir, directory))
-
-    for i in tqdm.trange(seq_start, seq_end):
-        file_base = "{}{}".format(base, i)
-        mol_path = structure_dir + "/" + file_base + ".xyz"
-        mol = read(mol_path)
-        atom_types = mol.get_chemical_symbols()
-        #i += 1
-        #  print("%d. pdb file is processing ..." %i)
-        #  print("Calcultion starts for %s" %file_base)
-
-        # check atom type for ani2x
-        ani2_atom_type = [sym for sym in atom_types if sym in ["Cl", "F", "S"]]
-
-        if len(ani2_atom_type) >= 1:
-            results_anix = 0
-            results_aniccx = 0
-            results_ani2x = calcSPWithAni(model_ani2x_path, traj_path, mol)
-            list_results = [str(file_base), results_anix, results_aniccx, results_ani2x]
-        else:
-            results_anix = calcSPWithAni(model_anix_path, traj_path, mol)
-            results_aniccx = calcSPWithAni(model_aniccx_path, traj_path, mol)
-            results_ani2x = calcSPWithAni(model_ani2x_path, traj_path, mol)
-            list_results = [str(file_base), results_anix, results_aniccx, results_ani2x]
-
-        df_results = pd.DataFrame([list_results], columns=labels)
-        df_results.to_csv("%s/%s_SP_energies.csv" %(structure_dir, directory), mode="a", header=False)
-
-def runSP(directory, file_base):
-    list_results = []
-    structure_dir = directory
-    traj_path =  "%s/traj_files" %structure_dir
-
-    mol_path = structure_dir + "/" + file_base + ".xyz"
-    mol = read(mol_path)
-    atom_types = mol.get_chemical_symbols()
-
-    if not os.path.exists(traj_path):
-        traj_path = os.mkdir(traj_path)
-
-    # check atom type for ani2x
-    ani2_atom_type = [sym for sym in atom_types if sym in ["Cl", "F", "S"]]
-
-    if len(ani2_atom_type) >= 1:
-        results_anix = 0
-        results_aniccx = 0
-        results_ani2x = calcSPWithAni(model_ani2x_path, traj_path, mol)
-        list_results = [str(file_base), results_anix, results_aniccx, results_ani2x]
-    else:
-        results_anix = calcSPWithAni(model_anix_path, traj_path, mol)
-        results_aniccx = calcSPWithAni(model_aniccx_path, traj_path, mol)
-        results_ani2x = calcSPWithAni(model_ani2x_path, traj_path, mol)
-        list_results = [str(file_base), results_anix, results_aniccx, results_ani2x]
-
-    labels = ["Mol", "SPE_anix", "SPE_aniccx", "SPE_ani2x"]
-    for label, value in zip(labels, list_results):
-        print("{} --> {}".format(label, value))
-
-def runOptSingleMol(structure_dir, file_base, thr_fmax):
-
-    traj_path =  "%s/traj_files" %structure_dir
-
-    if not os.path.exists(traj_path):
-        traj_path = os.mkdir(traj_path)
-    
-    prepare_xyz_complex(structure_dir, file_base)
-
-    mol_path = structure_dir + "/" + file_base + ".xyz"
-
-    # check .xyz structure file
-    #if not os.path.exists(mol_path):
-    #pdb2xyz(structure_dir, file_base)
-    
-    # Read molecule from xyz
-    mol = read(mol_path)
-
-    mol.set_calculator(ANIENS(aniensloader(model_ani2x_path, 0)))
-
-    start_time = time.time()
-    #dyn = LBFGS(mol, trajectory="%s/%s.traj" %(traj_path, file_base))
-    dyn = LBFGS(mol)
-    dyn.run(fmax=thr_fmax)
-    run_time = time.time() - start_time
-    print('[ANI Optimization - Total time:', run_time, 'seconds]')
-
-    # Calculate energy
-    ef = mol.get_potential_energy()
-    write("%s/optimzed_%s.xyz" %(structure_dir, file_base), mol)
-    print("Final Energy: ", ef)
-    print("job is end for %s" %file_base)
-    return [ef, run_time]
-
-def runOptFreqSingleMol(structure_dir, file_base, thr_fmax):
-
-    traj_path =  "%s/traj_files" %structure_dir
-
-    if not os.path.exists(traj_path):
-        traj_path = os.mkdir(traj_path)
-
-    mol_path = structure_dir + "/" + file_base + ".xyz"
-
-    # check .xyz structure file
-    #if not os.path.exists(mol_path):
-    #    pdb2xyz(structure_dir, file_base)
-
-    # Read molecule from xyz
-    mol = read(mol_path)
-
-    mol.set_calculator(ANIENS(aniensloader(model_ani2x_path, 0)))
-
-    start_time = time.time()
-    #dyn = LBFGS(mol, trajectory="%s/%s.traj" %(traj_path, file_base))
-    dyn = LBFGS(mol)
-    dyn.run(fmax=thr_fmax)
-    run_time = time.time() - start_time
-    print('[ANI Optimization - Total time:', run_time, 'seconds]')
-    
-    # Calculate energy
-    ef = mol.get_potential_energy()
-    print("Final Energy: ", ef)
-    print("job is end for %s" %file_base)
-
-    vib = Vibrations(mol)
-    vib.run()
-    return [ef, vib.get_energies()]
-
-def termo_hormonic_limit(vib_energies, pot_energy):
-    return HarmonicThermo(vib_analysis, pot_energy)
-
-def runOptMultiMol(directory, base, seq_start, seq_end, thr_fmax):
-    csv_file_name = "%s_opt_energies.csv"%directory
-    list_results = []
-    structure_dir = os.getcwd() + "/" + directory
-
-    #file_names = [item for item in os.listdir(structure_dir) if ".pdb" in item]
-    #file_names = [item for item in file_names if "A15B15" in item]
-    #file_names = ["A14_B12.pdb"]
-    calculated_files_path = structure_dir + "/" + csv_file_name
-    if os.path.exists(calculated_files_path):
-        df_calculated_files = pd.read_csv(calculated_files_path, index_col=0)
-        calculated_files = df_calculated_files["Structure"].to_list()
-    else:
-        df_calculated_files = pd.DataFrame(list_results, columns=["Structure", "Optimzation_E_(eV)", "Run_time_(s)"])
-        df_calculated_files.to_csv(calculated_files_path)
-        calculated_files = df_calculated_files["Structure"].to_list()
-
-    for i in range(seq_start, seq_end):
-        #file_base = file_name.replace(".pdb", "")
-        file_base = "{}{}".format(base, i)
-        if file_base in calculated_files:
-            #print(df_calculated_files.loc[df_calculated_files["Structure"] == file_base].iloc[0])
-            list_results.append(df_calculated_files.loc[df_calculated_files["Structure"] == file_base].iloc[0].to_list())
-            df_results = pd.DataFrame(list_results, columns=["Structure", "Optimzation_E_(eV)", "Run_time_(s)"])
-            df_results.to_csv(calculated_files_path)
-            print("Exist Energy for %s structure" %file_base)
-            continue
-
-        print("Calcultion starts for %s" %file_base)
-        #convert from pdb to xyz
-        #if not os.path.exists(mol_path):
-        #    pdb2xyz(structure_dir, file_base)
-        #try:
-        results = runOptSingleMol(directory, file_base, thr_fmax)
-        #except:
-            #continue
-
-        results.insert(0, file_base)
-
-        list_results.append(results)
-        df_results = pd.DataFrame(list_results, columns=["Structure", "Optimzation_E_(eV)", "Run_time_(s)"])
-        df_results.to_csv("%s/%s" %(structure_dir, csv_file_name), mode="a", header=False)
-
-#for i in range(5, 5):
-#print("calculating ACS_M19_md_%s_solv"%i)
-
+args = parser.parse_args()
+model_names = ["ani1x", "ani2x"]
+model_names = args.model_list
 
 if args.calcMode == "sp_single_mol":
     #  file_base = "/M23_less_10001"
