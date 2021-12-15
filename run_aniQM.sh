@@ -5,7 +5,7 @@ export PATH=/usr/local/cuda-9.2/bin${PATH:+:${PATH}}
 export LD_LIBRARY_PATH=/usr/local/cuda-9.2/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
 
 ###### NC_ROOT EXPORTS ########
-export NC_ROOT="/home/modellab/ASE_ANI"
+export NC_ROOT="/cta/users/otayfuroglu/workspace/ASE_ANI/"
 export LD_LIBRARY_PATH="$NC_ROOT/lib:$LD_LIBRARY_PATH"
 export PYTHONPATH="$NC_ROOT/lib:$PYTHONPATH"
 
@@ -20,14 +20,16 @@ export PYTHONPATH="$NC_ROOT/lib:$PYTHONPATH"
 #-group2 (default=SOL) lig or sol keyword in pdb
 #-thr_fmax (default=0.01)
 
-ANI_DIR="/home/modellab/ASE_ANI"
-PYTHON_DIR="$HOME/miniconda3/envs/automd/bin"
-$PYTHON_DIR/python aniQM.py\
+deepQM_DIR="/cta/users/otayfuroglu/workspace/deepQM"
+ANI_DIR="/cta/users/akocak/ASE_ANI/"
+PYTHON_DIR="$HOME/miniconda3/bin"
+
+$PYTHON_DIR/python $deepQM_DIR/aniQM.py\
 	-aniDIR $ANI_DIR\
 	-calcMode sp_grouped_multi_mol\
-	-struct_dir /home/modellab/Desktop/PROJE_serdar/file\
-	-fbase .\
-    	-namebase deneme_\
+	-struct_dir PRO\
+	-fbase PRO\
+    	-namebase test_\
     	-seq_start 1\
     	-seq_end 2\
     	-group1 ATOM\
