@@ -101,10 +101,6 @@ def runSPgroupedMultiMol(grp1, grp2, directory, base, seq_start, seq_end):
         labels +=  ["SPE_%s_%s_%s"%(model_name, grp1, grp2),
                    "SPE_%s_%s"%(model_name, grp1),
                    "SPE_%s_%s"%(model_name, grp2), "diff_%s" %model_name]
-    #  labels = ["Structure"] +  ["SPE_anix_%s_%s"%(grp1, grp2), "SPE_anix_%s"%grp1, "SPE_anix_%s"%grp2,
-    #            "SPE_aniccx_%s_%s"%(grp1, grp2), "SPE_aniccx_%s"%grp1, "SPE_aniccx_%s"%grp2,
-    #            "SPE_ani2x_%s_%s"%(grp1, grp2), "SPE_ani2x_%s"%grp1, "SPE_ani2x_%s"%grp2,
-    #            "diff_anix", "diff_aniccx", "diff_ani2x"]
 
     df_results = pd.DataFrame(columns=labels)
     df_results.to_csv("%s/%s_SP_energies.csv" %(structure_dir, base))
