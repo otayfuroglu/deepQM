@@ -64,7 +64,7 @@ parser.add_argument("-thr_fmax", "--thr_fmax",
                     help="")
 
 
-def calcSPWithAni(calculator, mol):
+def calcSPWithModel(calculator, mol):
 
     mol.set_calculator(calculator)
 
@@ -132,8 +132,8 @@ def runSPgroupedMultiMol(grp1, grp2, directory, base, seq_start, seq_end):
 
         j = 0
         for model_name, model in load_models(model_names).items():
-            result = calcSPWithAni(model, mol)
-            data[f"{model_name}"].append(calcSPWithAni(model, mol))
+            result = calcSPWithModel(model, mol)
+            data[f"{model_name}"].append(calcSPWithModel(model, mol))
             if result == 0.0:
                 for grp in [grp1, grp2]:
                     data[f"{model_name}"].append(result)
@@ -145,7 +145,7 @@ def runSPgroupedMultiMol(grp1, grp2, directory, base, seq_start, seq_end):
                         file_base_new = "{}_{}".format(file_base, grp)
                         mol_path = structure_dir + "/" + file_base_new + ".xyz"
                         mol = read(mol_path)
-                    data[f"{model_name}"].append(calcSPWithAni(model, mol))
+                    data[f"{model_name}"].append(calcSPWithModel(model, mol))
             j += 1
 
         list_results = [file_base]
@@ -158,7 +158,6 @@ def runSPgroupedMultiMol(grp1, grp2, directory, base, seq_start, seq_end):
 
 
 args = parser.parse_args()
-model_names = ["ani1x", "ani2x"]
 model_names = args.model_list
 
 if args.calcMode == "sp_single_mol":
