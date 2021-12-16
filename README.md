@@ -1,3 +1,3 @@
 # deepQM
 # Notes for modellab group:
--run_deepQM in test directory
+-run_deepQM.sh in test directory
