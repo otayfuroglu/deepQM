@@ -16,8 +16,8 @@ import tqdm
 import numpy  as np
 import argparse
 
+#  from aimnet import load_AIMNetMT_ens, load_AIMNetSMD_ens, AIMNetCalculator
 from aniqm_utils import prepare_xyz_grp, prepare_xyz_complex, pdb2xyz
-from aimnet import load_AIMNetMT_ens, load_AIMNetSMD_ens, AIMNetCalculator
 import torchani
 
 import torch
@@ -91,13 +91,13 @@ def load_models(model_names):
     ani2x = torchani.models.ANI2x().to(device).ase()
 
     # model list aimnet
-    model_gas = load_AIMNetMT_ens().to(device)
-    model_smd = load_AIMNetSMD_ens().to(device)
-    aimnet_gas = AIMNetCalculator(model_gas)
-    aimnet_smd = AIMNetCalculator(model_smd)
+    #  model_gas = load_AIMNetMT_ens().to(device)
+    #  model_smd = load_AIMNetSMD_ens().to(device)
+    #  aimnet_gas = AIMNetCalculator(model_gas)
+    #  aimnet_smd = AIMNetCalculator(model_smd)
 
-    models = {"ani1x": ani1x, "ani1ccx": ani1ccx, "ani2x": ani2x,
-              "aimnetgas": aimnet_gas, "aimnetsmd": aimnet_smd}
+    models = {"ani1x": ani1x, "ani1ccx": ani1ccx, "ani2x": ani2x,}
+              #  "aimnetgas": aimnet_gas, "aimnetsmd": aimnet_smd}
 
     return {key: models[key] for key in model_names}
 
