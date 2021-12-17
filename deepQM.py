@@ -17,7 +17,7 @@ import numpy  as np
 import argparse
 
 #  from aimnet import load_AIMNetMT_ens, load_AIMNetSMD_ens, AIMNetCalculator
-from aniqm_utils import prepare_xyz_grp, prepare_xyz_complex, pdb2xyz
+from deepqm_utils import prepare_xyz_files
 import torchani
 
 import torch
@@ -26,42 +26,17 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 
 parser = argparse.ArgumentParser(description="Give something ...")
-parser.add_argument("-aniDIR", "--aniDIR",
-                    type=str, required=True,
-                    help="")
-parser.add_argument("-calcMode", "--calcMode",
-                    type=str, required=True,
-                    help="")
-parser.add_argument("-model_list", "--model_list", nargs='+', default=[],
-                    type=str, required=True,
-                    help="")
-parser.add_argument("-struct_dir", "--struct_dir",
-                    type=str, required=True,
-                    help="")
-parser.add_argument("-fbase", "--fbase",
-                    type=str, required=True,
-                    help="")
-parser.add_argument("-namebase", "--namebase",
-                    type=str, required=False,
-                    help="")
-parser.add_argument("-seq_start", "--seq_start",
-                    type=int, required=False, default=0,
-                    help="")
-parser.add_argument("-seq_end", "--seq_end",
-                    type=int, required=False, default=1E6,
-                    help="")
-
-parser.add_argument("-group1", "--group1",
-                    type=str, required=False,
-                    help="")
-
-parser.add_argument("-group2", "--group2",
-                    type=str, required=False, default="SOL",
-                    help="")
-
-parser.add_argument("-thr_fmax", "--thr_fmax",
-                    type=float, required=False, default=0.01,
-                    help="")
+parser.add_argument("calcMode", type=str)
+parser.add_argument("model_list", nargs='+', default=[], type=str)
+parser.add_argument("struct_dir", type=str)
+parser.add_argument("fbase", type=str)
+parser.add_argument("namebase", type=str, )
+parser.add_argument("seq_start", type=int, default=1)
+parser.add_argument("seq_end", type=int, default=1E6)
+parser.add_argument("index_file_path", type=str)
+parser.add_argument("group1", type=int)
+parser.add_argument("group2", type=int, default="SOL")
+parser.add_argument("thr_fmax", type=float, default=0.01)
 
 
 def calcSPWithModel(calculator, mol):
@@ -77,11 +52,11 @@ def calcSPWithModel(calculator, mol):
     worning = """Warning: an error was encountered.
     CUDA out of memory in case of aimnet model or your system may contain elements such as \"F, Cl and S\".
     Returned 0.0 for energy"""
-    try:
-        return np.round(mol.get_potential_energy(), 8)
-    except:
-        print(worning)
-        return 0.0
+    #  try:
+    return np.round(mol.get_potential_energy(), 9)
+    #  except:
+    #      print(worning)
+    #      return 0.0
 
 
 def load_models(model_names):
@@ -121,13 +96,12 @@ def runSPgroupedMultiMol(grp1, grp2, directory, base, seq_start, seq_end):
     for i in range(seq_start, seq_end):
         file_base = "{}{}".format(base, i)
 
-        prepare_xyz_complex(structure_dir, file_base, grp1, grp2)
+        prepare_xyz_files(structure_dir, file_base, args.index_file_path, grp1, grp2)
         mol_path = structure_dir + "/" + file_base + ".xyz"
         mol = read(mol_path)
 
         data = {model_name: [] for model_name in model_names}
         print("%d. pdb file is processing ..." %i)
-        #file_base = file_name.replace(".pdb", "").replace(".xyz", "")
         print("Calcultion starts for %s" %file_base)
 
         j = 0
@@ -135,14 +109,14 @@ def runSPgroupedMultiMol(grp1, grp2, directory, base, seq_start, seq_end):
             result = calcSPWithModel(model, mol)
             data[f"{model_name}"].append(calcSPWithModel(model, mol))
             if result == 0.0:
-                for grp in [grp1, grp2]:
+                for grp in [grp2, grp2]:
                     data[f"{model_name}"].append(result)
                 continue
             else:
                 for grp in [grp1, grp2]:
                     if j == 0:
-                        prepare_xyz_grp(grp, structure_dir, file_base)
-                        file_base_new = "{}_{}".format(file_base, grp)
+                        #  prepare_xyz_grp(grp, structure_dir, args.index_file_path, file_base)
+                        file_base_new = "{}_grp_{}".format(file_base, grp)
                         mol_path = structure_dir + "/" + file_base_new + ".xyz"
                         mol = read(mol_path)
                     data[f"{model_name}"].append(calcSPWithModel(model, mol))
