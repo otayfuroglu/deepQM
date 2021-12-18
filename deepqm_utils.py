@@ -70,15 +70,17 @@ def prepare_xyz_files(structure_dir, file_base, index_file_path, grp1, grp2):
 
     sys_coords = []
     for grps in [grp1, grp2]:
+        grp_coords = []
         for grp in set(grps):
-            grp_coords = get_grp_coords(grp, structure_dir, index_file_path, file_base)
-            sys_coords += grp_coords.tolist()
+            grp_coords += get_grp_coords(grp, structure_dir, index_file_path, file_base).tolist()
+        sys_coords += grp_coords
 
-        fl_xyz_grp = open("{}/{}_grp_{}.xyz".format(structure_dir, file_base, grp), "w")
+        grp_xyz_path = "{}/{}_grp_{}.xyz".format(structure_dir, file_base, "".join(map(str, grps)))
+        fl_xyz_grp = open(grp_xyz_path, "w")
 
         init_line = len(grp_coords)
 
-        fl_xyz_grp.write(str(init_line)+"\n{}/{}_{}.xyz\n".format(structure_dir, file_base, grp)) # file root to second row
+        fl_xyz_grp.write(str(init_line)+"\n\n")
         coords2file(fl_xyz_grp, grp_coords)
 
 
