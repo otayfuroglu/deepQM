@@ -69,9 +69,10 @@ def coords2file(fl_xyz, coords):
 def prepare_xyz_files(structure_dir, file_base, index_file_path, grp1, grp2):
 
     sys_coords = []
-    for grp in [grp1, grp2]:
-        grp_coords = get_grp_coords(grp, structure_dir, index_file_path, file_base)
-        sys_coords += grp_coords.tolist()
+    for grps in [grp1, grp2]:
+        for grp in set(grps):
+            grp_coords = get_grp_coords(grp, structure_dir, index_file_path, file_base)
+            sys_coords += grp_coords.tolist()
 
         fl_xyz_grp = open("{}/{}_grp_{}.xyz".format(structure_dir, file_base, grp), "w")
 
