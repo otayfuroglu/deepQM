@@ -34,8 +34,8 @@ parser.add_argument("namebase", type=str, )
 parser.add_argument("seq_start", type=int, default=1)
 parser.add_argument("seq_end", type=int, default=1E6)
 parser.add_argument("index_file_path", type=str)
-parser.add_argument("group1", type=int)
-parser.add_argument("group2", type=int, default="SOL")
+parser.add_argument("group1", nargs='+', default=[], type=int)
+parser.add_argument("group2", nargs='+', default=[], type=int)
 parser.add_argument("thr_fmax", type=float, default=0.01)
 
 
@@ -52,11 +52,11 @@ def calcSPWithModel(calculator, mol):
     worning = """Warning: an error was encountered.
     CUDA out of memory in case of aimnet model or your system may contain elements such as \"F, Cl and S\".
     Returned 0.0 for energy"""
-    #  try:
-    return np.round(mol.get_potential_energy(), 9)
-    #  except:
-    #      print(worning)
-    #      return 0.0
+    try:
+        return np.round(mol.get_potential_energy(), 8)
+    except:
+        print(worning)
+        return 0.0
 
 
 def load_models(model_names):
@@ -113,13 +113,14 @@ def runSPgroupedMultiMol(grp1, grp2, directory, base, seq_start, seq_end):
                     data[f"{model_name}"].append(result)
                 continue
             else:
-                for grp in [grp1, grp2]:
-                    if j == 0:
-                        #  prepare_xyz_grp(grp, structure_dir, args.index_file_path, file_base)
-                        file_base_new = "{}_grp_{}".format(file_base, grp)
-                        mol_path = structure_dir + "/" + file_base_new + ".xyz"
-                        mol = read(mol_path)
-                    data[f"{model_name}"].append(calcSPWithModel(model, mol))
+                for grps in [grp1, grp2]:
+                    for grp in set(grps):
+                        if j == 0:
+                            #  prepare_xyz_grp(grp, structure_dir, args.index_file_path, file_base)
+                            file_base_new = "{}_grp_{}".format(file_base, grp)
+                            mol_path = structure_dir + "/" + file_base_new + ".xyz"
+                            mol = read(mol_path)
+                        data[f"{model_name}"].append(calcSPWithModel(model, mol))
             j += 1
 
         list_results = [file_base]
