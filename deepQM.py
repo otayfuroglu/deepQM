@@ -62,7 +62,7 @@ def calcSPWithModel(calculator, mol):
         return 0.0
 
 
-def load_models(model_names):
+def load_models(model_names, device):
     # model_list ani
     ani1x = torchani.models.ANI1x().to(device).ase()
     ani1ccx = torchani.models.ANI1ccx().to(device).ase()
@@ -120,7 +120,8 @@ def get_diff(model_data):
 
 def _SPgroupedMultiMol(idx):
     if ngpu != 0:
-        os.environ["CUDA_VISIBLE_DEVICES"] = str(idx % ngpu)
+        #  os.environ["CUDA_VISIBLE_DEVICES"] = str(idx % ngpu)
+        device = torch.device('cuda:%s' %str(idx % ngpu))
     #  ani2x = torchani.models.ANI2x().to(device).ase()
 
     file_names = _getFilenames()
@@ -135,7 +136,7 @@ def _SPgroupedMultiMol(idx):
     print("%s. pdb file is processing ..." %file_name)
 
     j = 0
-    for model_name, model in load_models(model_names).items():
+    for model_name, model in load_models(model_names, device).items():
         result = calcSPWithModel(model, mol)
         data[f"{model_name}"].append(result)
         if result == 0.0:
@@ -188,8 +189,8 @@ def runSPgroupedMultiMol(n_procs):
 
 def _SPMultiMol(idx):
     if ngpu != 0:
-        os.environ["CUDA_VISIBLE_DEVICES"] = str(idx % ngpu)
-    #  ani2x = torchani.models.ANI2x().to(device).ase()
+        #  os.environ["CUDA_VISIBLE_DEVICES"] = str(idx % ngpu)
+        device = torch.device('cuda:%s' %str(idx % ngpu))
 
     file_names = _getFilenames()
     file_name = file_names[idx]
@@ -202,11 +203,9 @@ def _SPMultiMol(idx):
     data = {model_name: [] for model_name in model_names}
     print("%s. pdb file is processing ..." %file_name)
 
-    j = 0
-    for model_name, model in load_models(model_names).items():
+    for model_name, model in load_models(model_names, device).items():
         result = calcSPWithModel(model, mol)
         data[f"{model_name}"].append(result)
-        j += 1
 
     list_results = [file_base]
     for model_name in model_names:
@@ -264,7 +263,6 @@ def runOptSingleMol(file_base):
 def _optGroupedMultiMol(idx):
     if ngpu != 0:
         os.environ["CUDA_VISIBLE_DEVICES"] = str(idx % ngpu)
-    #  ani2x = torchani.models.ANI2x().to(device).ase()
 
     file_names = _getFilenames()
     file_name = file_names[idx]
@@ -294,8 +292,8 @@ def runOptGroupedMultiMol(n_procs, thr_fmax):
 def _OptMultiMol(idx):
 
     if ngpu != 0:
-        os.environ["CUDA_VISIBLE_DEVICES"] = str(idx % ngpu)
-    #  ani2x = torchani.models.ANI2x().to(device).ase()
+        #  os.environ["CUDA_VISIBLE_DEVICES"] = str(idx % ngpu)
+        device = torch.device('cuda:%s' %str(idx % ngpu))
 
     file_names = _getFilenames()
     file_name = file_names[idx]
@@ -304,11 +302,9 @@ def _OptMultiMol(idx):
     data = {model_name: [] for model_name in model_names}
     print("%s. pdb file is processing ..." %file_name)
 
-    j = 0
     for model_name, model in load_models(model_names).items():
         result = runOptSingleMol(file_base)
         data[f"{model_name}"].append(result)
-        j += 1
 
     list_results = [file_base]
     for model_name in model_names:
@@ -360,7 +356,6 @@ else:
     thr_fmax= args.thr_fmax
 
 if __name__ == "__main__":
-
     try:
          set_start_method('spawn')
     except RuntimeError:
