@@ -8,10 +8,10 @@ PYTHON_DIR="$HOME/miniconda3/bin"
 #- set calculation
 # Mode: Options -> sp_single_mol, sp_multi_mol, sp_grouped_multi_mol,
 # opt_grouped_multi_mol, opt_single_mol, opt_multi_mol
-calcMode=opt_single_mol
+calcMode=sp_grouped_multi_mol
 
 # set number of processors
-n_procs=1
+n_procs=2
 
 # define model/s: Available model_list="ani1x ani1ccx ani2x aimnetgas aimnetsmd"
 model_list="ani2x"
@@ -28,11 +28,12 @@ namebase=2ze1_complex
 # set sequence of start (default=0) pose sarting number
 # set sequence of end (default=1E6) pose ending number
 seq_start=0
-seq_end=1
+seq_end=-1
 
 
 # groups index file
-index_file_path="./2E/2ze1_complex.ndx"
+# index_file_path="./2E/2ze1_complex.ndx"
+index_file_path="None"
 
 # set group1 M23\ protein keyword in pdb
 # set group2 (default=SOL) lig or sol keyword in pdb
