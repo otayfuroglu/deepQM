@@ -302,7 +302,7 @@ def _OptMultiMol(idx):
     data = {model_name: [] for model_name in model_names}
     print("%s. pdb file is processing ..." %file_name)
 
-    for model_name, model in load_models(model_names).items():
+    for model_name, model in load_models(model_names, device).items():
         result = runOptSingleMol(file_base)
         data[f"{model_name}"].append(result)
 
