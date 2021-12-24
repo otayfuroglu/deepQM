@@ -23,7 +23,6 @@ import torchani
 import torch
 ngpu = torch.cuda.device_count()
 print("Nuber of CUDA devices: ", ngpu)
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 
 parser = argparse.ArgumentParser(description="Give something ...")
@@ -38,6 +37,7 @@ parser.add_argument("index_file_path", type=str)
 parser.add_argument("group1", type=str)
 parser.add_argument("group2", type=str)
 parser.add_argument("thr_fmax", type=float, default=0.01)
+parser.add_argument("maxiter", type=float, default=500)
 
 
 
@@ -114,21 +114,25 @@ def _getFilenames():
     else:
         return ["{}{}.pdb".format(namebase, i) for i in range(seq_start, seq_end)]
 
+def _getDevices(idx):
+    if ngpu != 0:
+        #  os.environ["CUDA_VISIBLE_DEVICES"] = str(idx % ngpu)
+        return torch.device('cuda:%s' %str(idx % ngpu))
+    else:
+        return torch.device("cpu")
+
 
 def get_diff(model_data):
     return [model_data[0] - model_data[1] - model_data[2]]
 
 def _SPgroupedMultiMol(idx):
-    if ngpu != 0:
-        #  os.environ["CUDA_VISIBLE_DEVICES"] = str(idx % ngpu)
-        device = torch.device('cuda:%s' %str(idx % ngpu))
-    #  ani2x = torchani.models.ANI2x().to(device).ase()
+    device = _getDevices(idx)
 
     file_names = _getFilenames()
     file_name = file_names[idx]
     file_base = file_name.replace(".pdb", "")
 
-    prepare_xyz_files(structure_dir, file_base)
+    prepare_xyz_files_grouped(structure_dir, file_base, index_file_path, grp1, grp2)
     mol_path = structure_dir + "/" + file_base + ".xyz"
     mol = read(mol_path)
 
@@ -188,9 +192,7 @@ def runSPgroupedMultiMol(n_procs):
 
 
 def _SPMultiMol(idx):
-    if ngpu != 0:
-        #  os.environ["CUDA_VISIBLE_DEVICES"] = str(idx % ngpu)
-        device = torch.device('cuda:%s' %str(idx % ngpu))
+    device = _getDevices(idx)
 
     file_names = _getFilenames()
     file_name = file_names[idx]
@@ -239,7 +241,7 @@ def runSPMultiMol(n_procs):
         result_list_tqdm.append(result)
 
 
-def runOptSingleMol(file_base):
+def runOptSingleMol(file_base, device):
 
     mol_path = structure_dir + "/" + file_base + ".xyz"
     mol = read(mol_path)
@@ -249,7 +251,7 @@ def runOptSingleMol(file_base):
 
     #  try:
     dyn = LBFGS(mol)
-    dyn.run(fmax=thr_fmax)
+    dyn.run(fmax=thr_fmax, steps=args.maxiter)
 
     # Calculate energy
     ef = mol.get_potential_energy()
@@ -261,8 +263,7 @@ def runOptSingleMol(file_base):
 
 
 def _optGroupedMultiMol(idx):
-    if ngpu != 0:
-        os.environ["CUDA_VISIBLE_DEVICES"] = str(idx % ngpu)
+    device = _getDevices(idx)
 
     file_names = _getFilenames()
     file_name = file_names[idx]
@@ -270,7 +271,7 @@ def _optGroupedMultiMol(idx):
 
     prepare_xyz_files_grouped(structure_dir, file_base, args.index_file_path, grp1, grp2)
 
-    runOptSingleMol(file_base)
+    runOptSingleMol(file_base, device)
     opt_xyz_path = "%s/optimized_%s.xyz" %(structure_dir, file_base)
     opt_pdb_path = "%s/%s.pdb" %(structure_dir, file_base)
     #  os.remove(opt_pdb_path)
@@ -291,9 +292,7 @@ def runOptGroupedMultiMol(n_procs, thr_fmax):
 
 def _OptMultiMol(idx):
 
-    if ngpu != 0:
-        #  os.environ["CUDA_VISIBLE_DEVICES"] = str(idx % ngpu)
-        device = torch.device('cuda:%s' %str(idx % ngpu))
+    device = _getDevices(idx)
 
     file_names = _getFilenames()
     file_name = file_names[idx]
@@ -303,7 +302,7 @@ def _OptMultiMol(idx):
     print("%s. pdb file is processing ..." %file_name)
 
     for model_name, model in load_models(model_names, device).items():
-        result = runOptSingleMol(file_base)
+        result = runOptSingleMol(file_base, device)
         data[f"{model_name}"].append(result)
 
     list_results = [file_base]
@@ -345,7 +344,7 @@ grp2 =  [int(i) for i in args.group2.split("_")]
 
 if "grouped" in args.calcMode:
     index_file_path = args.index_file_path
-    if not bool(index_file_path):
+    if not os.path.isfile(index_file_path):
         print("Error: Not found index file")
         sys.exit(1)
 
