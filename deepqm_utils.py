@@ -66,7 +66,7 @@ def coords2file(fl_xyz, coords):
         fl_xyz.write("\n")
     fl_xyz.close()
 
-def prepare_xyz_files(structure_dir, file_base, index_file_path, grp1, grp2):
+def prepare_xyz_files_grouped(structure_dir, file_base, index_file_path, grp1, grp2):
 
     sys_coords = []
     for grps in [grp1, grp2]:
@@ -89,6 +89,16 @@ def prepare_xyz_files(structure_dir, file_base, index_file_path, grp1, grp2):
     init_line = len(sys_coords)
     fl_xyz_sys.write(str(init_line)+"\n{}/{}.xyz\n".format(structure_dir, file_base)) # file root to second row
     coords2file(fl_xyz_sys, sys_coords)
+
+
+def prepare_xyz_files(structure_dir, file_base):
+
+    sys_coords = get_all_coords(structure_dir, file_base)
+    fl_xyz_sys = open("{}/{}.xyz".format(structure_dir, file_base), "w")
+    init_line = len(sys_coords)
+    fl_xyz_sys.write(str(init_line)+"\n{}/{}.xyz\n".format(structure_dir, file_base)) # file root to second row
+    coords2file(fl_xyz_sys, sys_coords)
+
 
 
 def get_grp_coords(grp, structure_dir, index_file_path, file_base):
