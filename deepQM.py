@@ -1,6 +1,4 @@
 #
-import sys
-
 import  ase
 import time
 from ase import units
@@ -9,7 +7,7 @@ from ase.optimize import BFGS, LBFGS
 from ase.vibrations import Vibrations
 
 import pandas as pd
-import os, re
+import os, re, sys
 from operator import itemgetter
 import tqdm
 
@@ -19,7 +17,7 @@ import argparse
 from torch.multiprocessing import Pool, Process, set_start_method
 
 #  from aimnet import load_AIMNetMT_ens, load_AIMNetSMD_ens, AIMNetCalculator
-from deepqm_utils import prepare_xyz_files
+from deepqm_utils import prepare_xyz_files_grouped, prepare_xyz_files
 import torchani
 
 import torch
@@ -129,7 +127,7 @@ def _SPgroupedMultiMol(idx):
     file_name = file_names[idx]
     file_base = file_name.replace(".pdb", "")
 
-    prepare_xyz_files(structure_dir, file_base, args.index_file_path, grp1, grp2)
+    prepare_xyz_files(structure_dir, file_base)
     mol_path = structure_dir + "/" + file_base + ".xyz"
     mol = read(mol_path)
 
@@ -148,7 +146,6 @@ def _SPgroupedMultiMol(idx):
             for grp in [grp1, grp2]:
                 #  for grp in set(grps):
                 if j == 0:
-                    #  prepare_xyz_grp(grp, structure_dir, args.index_file_path, file_base)
                     file_base_new = "{}_grp_{}".format(file_base, "".join(map(str, grp)))
                     mol_path = structure_dir + "/" + file_base_new + ".xyz"
                     mol = read(mol_path)
@@ -198,7 +195,7 @@ def _SPMultiMol(idx):
     file_name = file_names[idx]
     file_base = file_name.replace(".pdb", "")
 
-    prepare_xyz_files(structure_dir, file_base, args.index_file_path, grp1, grp2)
+    prepare_xyz_files(structure_dir, file_base)
     mol_path = structure_dir + "/" + file_base + ".xyz"
     mol = read(mol_path)
 
@@ -273,7 +270,7 @@ def _optGroupedMultiMol(idx):
     file_name = file_names[idx]
     file_base = file_name.replace(".pdb", "")
 
-    prepare_xyz_files(structure_dir, file_base, args.index_file_path, grp1, grp2)
+    prepare_xyz_files_grouped(structure_dir, file_base, args.index_file_path, grp1, grp2)
 
     runOptSingleMol(file_base)
     opt_xyz_path = "%s/optimized_%s.xyz" %(structure_dir, file_base)
@@ -344,12 +341,17 @@ args = parser.parse_args()
 n_procs = args.n_procs
 model_names = args.model_list
 structure_dir = args.struct_dir
-index_file_path = args.index_file_path
 namebase = args.namebase
 seq_start = args.seq_start
 seq_end = args.seq_end
 grp1 =  [int(i) for i in args.group1.split("_")]
 grp2 =  [int(i) for i in args.group2.split("_")]
+
+if "grouped" in args.calcMode:
+    index_file_path = args.index_file_path
+    if not bool(index_file_path):
+        print("Error: Not found index file")
+        sys.exit(1)
 
 if "sp" in args.calcMode.lower():
     calc_type = "SP"
