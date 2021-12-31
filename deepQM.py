@@ -56,7 +56,7 @@ def calcSPWithModel(calculator, mol):
     #      return 0.0
 
     try:
-        return np.round(mol.get_potential_energy(), 8)
+        return np.round(mol.get_potential_energy(), 6)
     except:
         print(worning)
         return 0.0
@@ -129,6 +129,7 @@ def get_diff(model_data):
 def checkZeroError(data):
     if sum([sum(list_val) for list_val in data.values()]) == 0.0:
         print("\n!!! All calculation result returned 0.0 !!!")
+        print("May be CUDA out of memory error.. Consider number of atoms in system")
         return True
     else:
         return False
@@ -303,8 +304,15 @@ def runOptGroupedMultiMol(n_procs, thr_fmax):
     idxs = range(len(file_names))
 
     # to optimizing strucututes
+    # for waiting all multi processes ends
+    results= []
     with Pool(n_procs) as pool:
-        pool.map(_optGroupedMultiMol, idxs)
+        result = pool.map_async(_optGroupedMultiMol, idxs)
+        pool.close()
+        pool.join()
+        results.append(result)
+    # wait for done all processes
+    [result.wait() for result in results]
 
     # to run sp grouped
     runSPgroupedMultiMol(n_procs)
@@ -370,6 +378,8 @@ seq_start = args.seq_start
 seq_end = args.seq_end
 grp1 =  [int(i) for i in args.group1.split("_")]
 grp2 =  [int(i) for i in args.group2.split("_")]
+
+#rm .xyz file in structure_dir
 
 if "grouped" in args.calcMode:
     index_file_path = args.index_file_path
