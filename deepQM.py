@@ -125,6 +125,15 @@ def _getDevices(idx):
 def get_diff(model_data):
     return [model_data[0] - model_data[1] - model_data[2]]
 
+
+def checkZeroError(data):
+    if sum([sum(list_val) for list_val in data.values()]) == 0.0:
+        print("\n!!! All calculation result returned 0.0 !!!")
+        return True
+    else:
+        return False
+
+
 def _SPgroupedMultiMol(idx):
     device = _getDevices(idx)
 
@@ -169,6 +178,9 @@ def _SPgroupedMultiMol(idx):
     df_results = pd.DataFrame([list_results], columns=labels)
     df_results.to_csv(csv_path, mode="a", header=False)
 
+    # for check sum of Zero error
+    return data
+
 
 def runSPgroupedMultiMol(n_procs):
     labels = ["Structure"]
@@ -188,6 +200,9 @@ def runSPgroupedMultiMol(n_procs):
 
     # implementation of  multiprocessor in tqdm. Ref.https://leimao.github.io/blog/Python-tqdm-Multiprocessing/
     for result in tqdm.tqdm(pool.imap_unordered(func=_SPgroupedMultiMol, iterable=idxs), total=len(idxs)):
+        #  check sum of Zero error
+        if checkZeroError(result):
+            sys.exit(1)
         result_list_tqdm.append(result)
 
 
@@ -219,6 +234,8 @@ def _SPMultiMol(idx):
     df_results = pd.DataFrame([list_results], columns=labels)
     df_results.to_csv(csv_path, mode="a", header=False)
 
+    # for check sum of Zero error
+    return data
 
 def runSPMultiMol(n_procs):
     labels = ["Structure"]
@@ -238,6 +255,9 @@ def runSPMultiMol(n_procs):
 
     # implementation of  multiprocessor in tqdm. Ref.https://leimao.github.io/blog/Python-tqdm-Multiprocessing/
     for result in tqdm.tqdm(pool.imap_unordered(func=_SPMultiMol, iterable=idxs), total=len(idxs)):
+        #  check sum of Zero error
+        if checkZeroError(result):
+            sys.exit(1)
         result_list_tqdm.append(result)
 
 
@@ -315,6 +335,9 @@ def _OptMultiMol(idx):
     df_results = pd.DataFrame([list_results], columns=labels)
     df_results.to_csv(csv_path, mode="a", header=False)
 
+    # for check sum of Zero error
+    return data
+
 def runOptMultiMol(n_procs, thr_fmax):
 
     file_names = _getFilenames()
@@ -327,9 +350,15 @@ def runOptMultiMol(n_procs, thr_fmax):
     csv_path = _getcsvPath()
     df_results.to_csv(csv_path)
 
-    # to optimizing strucututes
-    with Pool(n_procs) as pool:
-        pool.map(_OptMultiMol, idxs)
+    #  # to optimizing strucututes
+    #  with Pool(n_procs) as pool:
+    #      pool.map(_OptMultiMol, idxs)
+    # implementation of  multiprocessor in tqdm. Ref.https://leimao.github.io/blog/Python-tqdm-Multiprocessing/
+    for result in tqdm.tqdm(pool.imap_unordered(func=_OptMultiMol, iterable=idxs), total=len(idxs)):
+        #  check sum of Zero error
+        if checkZeroError(result):
+            sys.exit(1)
+        result_list_tqdm.append(result)
 
 
 args = parser.parse_args()
