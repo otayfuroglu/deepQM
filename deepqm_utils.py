@@ -6,7 +6,6 @@ from ase.io import read, write, trajectory
 
 import pandas as pd
 import os, re
-from operator import itemgetter
 
 import numpy  as np
 
@@ -56,10 +55,12 @@ def get_all_coords(structure_dir, file_base):
     return coords
 
 def coords2file(fl_xyz, coords):
+    # coords start at 30th index in pdb file
     for line in coords:
-        split_line = line[30:].split()
-        atom_sym=split_line[-1]
-        line = "\t".join(itemgetter(0, 1, 2)(split_line)) # select data for xyz format and convert from tuple to str
+        # atoms sym in 77-79 index in pdb file
+        atom_sym = line[77:80].strip()
+        coord = [line[30+pointer:30+pointer+8].strip() for pointer in [0, 8, 16]]
+        line = "\t".join(coord) # select data for xyz format and convert from tuple to str
         line = atom_sym + "\t" + line
 
         fl_xyz.write(line)
