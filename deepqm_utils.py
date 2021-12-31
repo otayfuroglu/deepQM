@@ -19,7 +19,7 @@ def pdb2xyz(structure_path, file_base):
 
 def fixed_atom_type(line):
     atom_type = "".join(re.findall("[a-zA-Z]+", line[11:17]))
-    if atom_type.lower()[0:2] in ["cl", "br"]:
+    if atom_type.lower()[0:2] in ["cl", "br", "na"]:
         line = line[:-6] + atom_type[:2] + " " + "\n"
     elif atom_type.lower()[0] in ["h", "c", "n", "o", "f", "i", "b","s"]:
         line = line[:-4] + atom_type[:1] + "  " + "\n"
@@ -58,7 +58,7 @@ def coords2file(fl_xyz, coords):
     # coords start at 30th index in pdb file
     for line in coords:
         # atoms sym in 77-79 index in pdb file
-        atom_sym = line[77:80].strip()
+        atom_sym = line[76:79].strip()
         coord = [line[30+pointer:30+pointer+8].strip() for pointer in [0, 8, 16]]
         line = "\t".join(coord) # select data for xyz format and convert from tuple to str
         line = atom_sym + "\t" + line
