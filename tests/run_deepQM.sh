@@ -14,7 +14,7 @@ calcMode=sp_grouped_multi_mol
 n_procs=2
 
 # define model/s: Available model_list="ani1x ani1ccx ani2x aimnetgas aimnetsmd"
-model_list="ani2x"
+model_list="ani1x ani1ccx ani2x"
 
 
 # struct_dir  # pdb files directory
@@ -28,11 +28,11 @@ namebase=2ze1_complex
 # set sequence of start (default=0) pose sarting number
 # set sequence of end (default=1E6) pose ending number
 seq_start=0
-seq_end=2
+seq_end=4
 
 
 # groups index file
-index_file_path="./2E/2ze1_complex.ndx"
+index_file_path="$struct_dir/index.ndx"
 # index_file_path="None"
 
 # set group1 M23\ protein keyword in pdb
@@ -42,12 +42,12 @@ group2="13"
 
 
 # set thrshold fmax for optimization (default=0.01)
-thr_fmax=1000.01
+thr_fmax=40.7
 
 #maximum iteration for optimization
 maxiter=500
 
-$PYTHON_DIR/python $deepQM_DIR/deepQM.py $calcMode $n_procs $model_list $struct_dir $namebase $seq_start $seq_end $index_file_path $group1 $group2 $thr_fmax $maxiter
+$PYTHON_DIR/python -W ignore $deepQM_DIR/deepQM.py $calcMode $n_procs $model_list $struct_dir $namebase $seq_start $seq_end $index_file_path $group1 $group2 $thr_fmax $maxiter
 
 
 
