@@ -114,6 +114,7 @@ def _getFilenames():
     else:
         return ["{}{}.pdb".format(namebase, i) for i in range(seq_start, seq_end)]
 
+
 def _getDevices(idx):
     if ngpu != 0:
         #  os.environ["CUDA_VISIBLE_DEVICES"] = str(idx % ngpu)
@@ -149,24 +150,21 @@ def _SPgroupedMultiMol(idx):
     data = {model_name: [] for model_name in model_names}
     print("%s. pdb file is processing ..." %file_name)
 
-    j = 0
     for model_name, model in load_models(model_names, device).items():
         result = calcSPWithModel(model, mol)
         data[f"{model_name}"].append(result)
         if result == 0.0:
-            for grp in [grp2, grp2]:
+            for grp in [grp1, grp2]:
                 data[f"{model_name}"].append(result)
             continue
         else:
             for grp in [grp1, grp2]:
                 #  for grp in set(grps):
-                if j == 0:
-                    file_base_new = "{}_grp_{}".format(file_base, "".join(map(str, grp)))
-                    mol_path = structure_dir + "/" + file_base_new + ".xyz"
-                    mol = read(mol_path)
-                result = calcSPWithModel(model, mol)
+                file_base_new = "{}_grp_{}".format(file_base, "".join(map(str, grp)))
+                mol_path = structure_dir + "/" + file_base_new + ".xyz"
+                mol_grp = read(mol_path)
+                result = calcSPWithModel(model, mol_grp)
                 data[f"{model_name}"].append(result)
-        j += 1
 
     list_results = [file_base]
     for model_name in model_names:
@@ -238,6 +236,7 @@ def _SPMultiMol(idx):
     # for check sum of Zero error
     return data
 
+
 def runSPMultiMol(n_procs):
     labels = ["Structure"]
 
@@ -298,6 +297,7 @@ def _optGroupedMultiMol(idx):
     #  os.remove(opt_pdb_path)
     os.system("obabel %s -O %s" %(opt_xyz_path, opt_pdb_path))
 
+
 def runOptGroupedMultiMol(n_procs, thr_fmax):
 
     file_names = _getFilenames()
@@ -345,6 +345,7 @@ def _OptMultiMol(idx):
 
     # for check sum of Zero error
     return data
+
 
 def runOptMultiMol(n_procs, thr_fmax):
 
