@@ -11,7 +11,7 @@ PYTHON_DIR="$HOME/miniconda3/bin"
 calcMode=sp_grouped_multi_mol
 
 # set number of processors
-n_procs=2
+n_procs=1
 
 # define model/s: Available model_list="ani1x ani1ccx ani2x aimnetgas aimnetsmd"
 model_list="ani1x ani1ccx ani2x"
@@ -27,8 +27,8 @@ namebase=2ze1_complex
 
 # set sequence of start (default=0) pose sarting number
 # set sequence of end (default=1E6) pose ending number
-seq_start=0
-seq_end=4
+seq_start=1
+seq_end=2
 
 
 # groups index file
@@ -42,7 +42,7 @@ group2="13"
 
 
 # set thrshold fmax for optimization (default=0.01)
-thr_fmax=40.7
+thr_fmax=0.7
 
 #maximum iteration for optimization
 maxiter=500

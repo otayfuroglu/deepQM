@@ -9,46 +9,28 @@ import os, re
 
 import numpy  as np
 
-def pdb2xyz(structure_path, file_base):
-
-    fixed_pdb(structure_path, file_base)
-
-    cmd = "obabel %s/%s.pdb -O %s/%s.xyz" %(structure_path, file_base, structure_path, file_base)
-    os.system("%s" %cmd)
-
+# range of constants of index in pdb file
+RECORDNAME = (0, 6)
+ATOMTYPE = (12, 16)
+ATOMSYM = (76, 78)
+STARTCOORD = 30
+LENCOORD = 8
 
 def fixed_atom_type(line):
-    atom_type = "".join(re.findall("[a-zA-Z]+", line[11:17]))
+    atom_type = "".join(re.findall("[a-zA-Z]+", line[ATOMTYPE[0]:ATOMTYPE[1]]))
     if atom_type.lower()[0:2] in ["cl", "br", "na"]:
-        line = line[:-6] + atom_type[:2] + " " + "\n"
+        line = line[:ATOMSYM[0]] + atom_type[:2] + " " + "\n"
     elif atom_type.lower()[0] in ["h", "c", "n", "o", "f", "i", "b","s"]:
-        line = line[:-4] + atom_type[:1] + "  " + "\n"
+        line = line[:ATOMSYM[0]] + atom_type[:1] + "  " + "\n"
     return line
-
-
-def fixed_pdb(structure_dir, file_base, grp1, grp2):
-    data_xyz = []
-    lines = open("{}/{}.pdb".format(structure_dir, file_base)).readlines()
-    fl_fixed_pdb = open("{}/{}.pdb".format(structure_dir, file_base), "w")
-    for line in lines:
-        if grp1 in line[:8] or grp2[:8] in line:
-            line=line.replace("1+","  ").replace("1-","  ")
-            if line[-2:-1] == " " :
-                line = fixed_atom_type(line)
-        fl_fixed_pdb.write(line)
-    fl_fixed_pdb.close()
 
 
 def get_all_coords(structure_dir, file_base):
     coords = []
     lines = open("{}/{}.pdb".format(structure_dir, file_base)).readlines()
     for line in lines:
-        if "ATOM" in line[:7] or "HETATM" in line[:7]:
-
-            # fixed pdb
-            # fixed chages
-            line=line.replace("1+","  ").replace("1-","  ")
-            if line[-2:-1] == " " :
+        if "ATOM" in line[RECORDNAME[0]:RECORDNAME[1]] or "HETATM" in line[RECORDNAME[0]:RECORDNAME[1]]:
+            if line[ATOMSYM[0]:ATOMSYM[1]].strip() == "":
                 # fiex missing atoms type end of column
                 line = fixed_atom_type(line)
             coords.append(line)
@@ -58,8 +40,9 @@ def coords2file(fl_xyz, coords):
     # coords start at 30th index in pdb file
     for line in coords:
         # atoms sym in 77-79 index in pdb file
-        atom_sym = line[76:79].strip()
-        coord = [line[30+pointer:30+pointer+8].strip() for pointer in [0, 8, 16]]
+        atom_sym = line[ATOMSYM[0]:ATOMSYM[1]].strip()
+        coord = [line[STARTCOORD+pointer:STARTCOORD+pointer+LENCOORD].strip()
+                 for pointer in [0, LENCOORD, 2*LENCOORD]] # for x, y, x coordinates
         line = "\t".join(coord) # select data for xyz format and convert from tuple to str
         line = atom_sym + "\t" + line
 
@@ -84,8 +67,6 @@ def prepare_xyz_files_grouped(structure_dir, file_base, index_file_path, grp1, g
         fl_xyz_grp.write(str(init_line)+"\n\n")
         coords2file(fl_xyz_grp, grp_coords)
 
-
-
     fl_xyz_sys = open("{}/{}.xyz".format(structure_dir, file_base), "w")
     init_line = len(sys_coords)
     fl_xyz_sys.write(str(init_line)+"\n{}/{}.xyz\n".format(structure_dir, file_base)) # file root to second row
@@ -99,7 +80,6 @@ def prepare_xyz_files(structure_dir, file_base):
     init_line = len(sys_coords)
     fl_xyz_sys.write(str(init_line)+"\n{}/{}.xyz\n".format(structure_dir, file_base)) # file root to second row
     coords2file(fl_xyz_sys, sys_coords)
-
 
 
 def get_grp_coords(grp, structure_dir, index_file_path, file_base):
@@ -127,12 +107,3 @@ def get_grp_coords(grp, structure_dir, index_file_path, file_base):
     coords = np.array(get_all_coords(structure_dir, file_base))
     return coords[grp_index]
 
-
-#  def prepare_xyz_grp(grp, structure_dir, index_file_path, file_base):
-#      fl_xyz = open("{}/{}_grp_{}.xyz".format(structure_dir, file_base, grp), "w")
-#
-#      grp_coords = get_grp_coords(grp, structure_dir, index_file_path, file_base)
-#      init_line = len(grp_coords)
-#
-#      fl_xyz.write(str(init_line)+"\n{}/{}_{}.xyz\n".format(structure_dir, file_base, grp)) # file root to second row
-#      coords2file(fl_xyz, grp_coords)
