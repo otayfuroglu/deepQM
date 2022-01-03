@@ -42,7 +42,7 @@ group2="13"
 
 
 # set thrshold fmax for optimization (default=0.01)
-thr_fmax=0.7
+thr_fmax=0.05
 
 #maximum iteration for optimization
 maxiter=500
