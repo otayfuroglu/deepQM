@@ -41,7 +41,7 @@ parser.add_argument("maxiter", type=float, default=500)
 
 
 
-worning = """Warning: an error was encountered.
+warning = """Warning: an error was encountered.
 CUDA out of memory in case of aimnet model or your system may contain elements such as \"F, Cl and S\".
 Returned 0.0 for energy"""
 
@@ -58,15 +58,34 @@ def calcSPWithModel(calculator, mol):
     try:
         return np.round(mol.get_potential_energy(), 6)
     except:
-        print(worning)
+        print(warning)
         return 0.0
 
 
-def load_models(model_names, device):
+def getD3calc(xc="pbe"):
+    from ase.calculators.dftd3 import DFTD3
+    return DFTD3(xc)
+
+
+def getD4calc(xc="pbe"):
+    from dftd4.ase import DFTD4
+    return DFTD4(method=xc)
+
+
+def load_calculators(model_names, device):
     # model_list ani
-    ani1x = torchani.models.ANI1x().to(device).ase()
-    ani1ccx = torchani.models.ANI1ccx().to(device).ase()
-    ani2x = torchani.models.ANI2x().to(device).ase()
+    models = {}
+    model_names = [model_name.lower() for model_name in model_names]
+    if "ani1x" in model_names:
+        models["ani1x"] = torchani.models.ANI1x().to(device).ase()
+    if "ani1ccx" in model_names:
+        models["ani1ccx"] = torchani.models.ANI1ccx().to(device).ase()
+    if "ani2x" in model_names:
+        models["ani2x"] = torchani.models.ANI2x().to(device).ase()
+    if "dft3" in model_names:
+        models["dft3"] = getD3calc()
+    if "dft4" in model_names:
+        models["dft4"] = getD4calc()
 
     # model list aimnet
     #  model_gas = load_AIMNetMT_ens().to(device)
@@ -74,10 +93,11 @@ def load_models(model_names, device):
     #  aimnet_gas = AIMNetCalculator(model_gas)
     #  aimnet_smd = AIMNetCalculator(model_smd)
 
-    models = {"ani1x": ani1x, "ani1ccx": ani1ccx, "ani2x": ani2x,}
+    #  models = {"ani1x": ani1x, "ani1ccx": ani1ccx, "ani2x": ani2x,}
               #  "aimnetgas": aimnet_gas, "aimnetsmd": aimnet_smd}
 
-    return {key: models[key] for key in model_names}
+    #  return {key: models[key] for key in model_names}
+    return models
 
 
 def _getLabels():
@@ -150,7 +170,7 @@ def _SPgroupedMultiMol(idx):
     data = {model_name: [] for model_name in model_names}
     print("%s. pdb file is processing ..." %file_name)
 
-    for model_name, model in load_models(model_names, device).items():
+    for model_name, model in load_calculators(model_names, device).items():
         result = calcSPWithModel(model, mol)
         data[f"{model_name}"].append(result)
         if result == 0.0:
@@ -219,7 +239,7 @@ def _SPMultiMol(idx):
     data = {model_name: [] for model_name in model_names}
     print("%s. pdb file is processing ..." %file_name)
 
-    for model_name, model in load_models(model_names, device).items():
+    for model_name, model in load_calculators(model_names, device).items():
         result = calcSPWithModel(model, mol)
         data[f"{model_name}"].append(result)
 
@@ -278,7 +298,7 @@ def runOptSingleMol(file_base, device):
     write("%s/optimized_%s.xyz" %(structure_dir, file_base), mol)
     return ef
     #  except:
-    #      print(worning)
+    #      print(warning)
     #      return 0.0
 
 
@@ -329,7 +349,7 @@ def _OptMultiMol(idx):
     data = {model_name: [] for model_name in model_names}
     print("%s. pdb file is processing ..." %file_name)
 
-    for model_name, model in load_models(model_names, device).items():
+    for model_name, model in load_calculators(model_names, device).items():
         result = runOptSingleMol(file_base, device)
         data[f"{model_name}"].append(result)
 
