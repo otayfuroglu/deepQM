@@ -62,7 +62,7 @@ def calcSPWithModel(calculator, mol):
         return 0.0
 
 
-def getD3calc(xc="pbe"):
+def getD3calc(xc="wb97x"):
     from ase.calculators.dftd3 import DFTD3
     return DFTD3(xc)
 
