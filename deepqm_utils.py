@@ -95,12 +95,12 @@ def get_grp_coords(grp, structure_dir, index_file_path, file_base):
 
     a = index_group[0]+1
     try:
-        b = index_group[1]
+        grp_lines = lines[a:index_group[1]]
     except:
-        b= -1
+        grp_lines = lines[a:]
 
     grp_index = []
-    for items in lines[a:b]:
+    for items in grp_lines:
         grp_index += [int(item) for item in items.split()]
 
     grp_index = np.array(grp_index) - 1
