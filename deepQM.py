@@ -82,10 +82,10 @@ def load_calculators(model_names, device):
         models["ani1ccx"] = torchani.models.ANI1ccx().to(device).ase()
     if "ani2x" in model_names:
         models["ani2x"] = torchani.models.ANI2x().to(device).ase()
-    if "dft3" in model_names:
-        models["dft3"] = getD3calc()
-    if "dft4" in model_names:
-        models["dft4"] = getD4calc()
+    if "dftd3" in model_names:
+        models["dftd3"] = getD3calc()
+    if "dftd4" in model_names:
+        models["dftd4"] = getD4calc()
 
     # model list aimnet
     #  model_gas = load_AIMNetMT_ens().to(device)
