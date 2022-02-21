@@ -309,7 +309,7 @@ def _optGroupedMultiMol(idx):
     file_name = file_names[idx]
     file_base = file_name.replace(".pdb", "")
 
-    prepare_xyz_files_grouped(structure_dir, file_base, args.index_file_path, grp1, grp2)
+    prepare_xyz_files_grouped(structure_dir, file_base, index_file_path, grp1, grp2)
 
     runOptSingleMol(file_base, device)
     opt_xyz_path = "%s/optimized_%s.xyz" %(structure_dir, file_base)
