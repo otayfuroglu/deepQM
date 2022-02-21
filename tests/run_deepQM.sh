@@ -14,15 +14,15 @@ calcMode=sp_grouped_multi_mol
 n_procs=1
 
 # define model/s: Available model_list="ani1x ani1ccx ani2x aimnetgas aimnetsmd"
-model_list="ani1x ani1ccx ani2x"
+model_list="dftd3"
 
 
 # struct_dir  # pdb files directory
-struct_dir=2E
+struct_dir=test_1
 
 
 # namebase 
-namebase=2ze1_complex
+namebase=4j0y_
 
 
 # set sequence of start (default=0) pose sarting number
