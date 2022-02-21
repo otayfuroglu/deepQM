@@ -36,16 +36,18 @@ if __name__ == "__main__":
     diff_ani2x = pd.read_csv(csv_path)["diff_ani2x"].to_numpy()
     diff_dftd3 = pd.read_csv(csv_path)["diff_dftd3"].to_numpy()
 
-    diff_ani2xEn = avg(diff_ani2x) * KT2KCAL
-    diff_dftd3En = avg(diff_dftd3) * KT2KCAL
+    diff_ani2x = diff_ani2x * EV2KT * KT2KCAL # kcal/mol
+    diff_dftd3 = diff_dftd3 * EV2KT * KT2KCAL # kcal/mol
 
-    diff_ani2xStd = std(diff_ani2x) * KT2KCAL
-    diff_dftd3Std = std(diff_dftd3) * KT2KCAL
+    diff_ani2xEn = avg(diff_ani2x)
+    diff_dftd3En = avg(diff_dftd3)
+
+    diff_ani2xStd = std(diff_ani2x)
+    diff_dftd3Std = std(diff_dftd3)
 
     data_bindEn = diff_ani2x * alpha  + diff_dftd3 * beta
-
-    bindEn = avg(data_bindEn) * KT2KCAL # kcal/mol
-    bindEnStd = std(data_bindEn) * KT2KCAL # kcal/mol
+    bindEn = avg(data_bindEn)
+    bindEnStd = std(data_bindEn)
 
     print(bindEn, bindEnStd)
 
