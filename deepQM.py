@@ -88,6 +88,7 @@ def load_calculators(model_names, device):
             print("dftd3 program CAN NOT FOUND !!!")
             print("You can install dftd3 by running the following command in command line")
             print("conda install -c psi4 dftd3")
+            sys.exit(1)
         else:
             models["dftd3"] = getD3calc()
     #  if "dftd4" in model_names:
