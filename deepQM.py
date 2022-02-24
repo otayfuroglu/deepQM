@@ -83,9 +83,19 @@ def load_calculators(model_names, device):
     if "ani2x" in model_names:
         models["ani2x"] = torchani.models.ANI2x().to(device).ase()
     if "dftd3" in model_names:
-        models["dftd3"] = getD3calc()
-    if "dftd4" in model_names:
-        models["dftd4"] = getD4calc()
+        from shutil import which
+        if which(name) is None:
+            print("dftd3 program CAN NOT FOUND !!!")
+            print("You can install dftd3 by running the following command in command line")
+            print("conda install -c psi4 dftd3")
+        else:
+            models["dftd3"] = getD3calc()
+    #  if "dftd4" in model_names:
+
+    #      models["dftd4"] = getD4calc()
+    else:
+        print("All calcultors or one CAN NOT FOUND !!!")
+        sys.exit(1)
 
     # model list aimnet
     #  model_gas = load_AIMNetMT_ens().to(device)
@@ -290,7 +300,7 @@ def runOptSingleMol(file_base, device):
     mol.set_calculator(ani2x)
 
     #  try:
-    dyn = LBFGS(mol)
+    dyn = LBFGS(mol, logfile="opt.log")
     dyn.run(fmax=thr_fmax, steps=args.maxiter)
 
     # Calculate energy
