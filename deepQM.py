@@ -11,10 +11,12 @@ import os, re, sys
 from operator import itemgetter
 import tqdm
 
+import shutil
 import numpy  as np
 import argparse
 #  from multiprocessing import Pool
 from torch.multiprocessing import Pool, Process, set_start_method
+from multiprocessing import current_process
 
 #  from aimnet import load_AIMNetMT_ens, load_AIMNetSMD_ens, AIMNetCalculator
 from deepqm_utils import prepare_xyz_files_grouped, prepare_xyz_files
@@ -72,6 +74,19 @@ def getD4calc(xc="pbe"):
     return DFTD4(method=xc)
 
 
+def setG16Calculator():
+    from ase.calculators.gaussian import Gaussian
+    procid = current_process
+
+    self.calculator = Gaussian(
+        label="tmp_g16/%s" % procid,
+        #  chk="tmp.chk",
+        xc="wb97x",
+        basis="6-31g*",
+        scf="maxcycle=100",
+    )
+
+
 def load_calculators(model_names, device):
     # model_list ani
     models = {}
@@ -83,14 +98,19 @@ def load_calculators(model_names, device):
     if "ani2x" in model_names:
         models["ani2x"] = torchani.models.ANI2x().to(device).ase()
     if "dftd3" in model_names:
-        from shutil import which
-        if which(name) is None:
+        if shutil.which(name) is None:
             print("dftd3 program CAN NOT FOUND !!!")
             print("You can install dftd3 by running the following command in command line")
             print("conda install -c psi4 dftd3")
             sys.exit(1)
         else:
             models["dftd3"] = getD3calc()
+    if "g16" in model_names:
+        if shutil.which(name) is None:
+            print("g16 program CAN NOT FOUND !!!")
+            sys.exit(1)
+        else:
+            models["g16"] = setG16Calculator()
     #  if "dftd4" in model_names:
 
     #      models["dftd4"] = getD4calc()
