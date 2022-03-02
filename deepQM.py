@@ -57,16 +57,21 @@ def calcSPWithModel(calculator, mol):
     #  if len(ani2_atom_type) >= 1:
     #      return 0.0
 
-    try:
-        return np.round(mol.get_potential_energy(), 6)
-    except:
-        print(warning)
-        return 0.0
+    # try:
+    return np.round(mol.get_potential_energy(), 6)
+    # except:
+    #     print(warning)
+    #     return 0.0
 
 
-def getD3calc(xc="wb97x"):
+def getD3calc(xc="B97-D"):
     from ase.calculators.dftd3 import DFTD3
-    return DFTD3(xc)
+    procid = current_process()
+
+    return DFTD3(
+        label="tmp_d3_%s" % procid.pid,
+        xc=xc
+    )
 
 
 def getD4calc(xc="pbe"):
@@ -76,15 +81,16 @@ def getD4calc(xc="pbe"):
 
 def setG16Calculator():
     from ase.calculators.gaussian import Gaussian
-    procid = current_process
+    procid = current_process()
 
-    self.calculator = Gaussian(
-        label="tmp_g16/%s" % procid,
+    calculator = Gaussian(
+        label="tmp_g16/%s" % procid.pid,
         #  chk="tmp.chk",
         xc="wb97x",
         basis="6-31g*",
         scf="maxcycle=100",
     )
+    return calculator
 
 
 def load_calculators(model_names, device):
@@ -98,7 +104,7 @@ def load_calculators(model_names, device):
     if "ani2x" in model_names:
         models["ani2x"] = torchani.models.ANI2x().to(device).ase()
     if "dftd3" in model_names:
-        if shutil.which(name) is None:
+        if shutil.which("dftd3") is None:
             print("dftd3 program CAN NOT FOUND !!!")
             print("You can install dftd3 by running the following command in command line")
             print("conda install -c psi4 dftd3")
@@ -106,7 +112,7 @@ def load_calculators(model_names, device):
         else:
             models["dftd3"] = getD3calc()
     if "g16" in model_names:
-        if shutil.which(name) is None:
+        if shutil.which("g16") is None:
             print("g16 program CAN NOT FOUND !!!")
             sys.exit(1)
         else:
@@ -114,9 +120,9 @@ def load_calculators(model_names, device):
     #  if "dftd4" in model_names:
 
     #      models["dftd4"] = getD4calc()
-    else:
-        print("All calcultors or one CAN NOT FOUND !!!")
-        sys.exit(1)
+    # else:
+    #     print("All calcultors or one CAN NOT FOUND !!!")
+    #     sys.exit(1)
 
     # model list aimnet
     #  model_gas = load_AIMNetMT_ens().to(device)
