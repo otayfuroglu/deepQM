@@ -64,7 +64,7 @@ def calcSPWithModel(calculator, mol):
     #     return 0.0
 
 
-def getD3calc(xc="B97-D"):
+def getD3calc(xc="pbe"):
     from ase.calculators.dftd3 import DFTD3
     procid = current_process()
 
@@ -76,7 +76,11 @@ def getD3calc(xc="B97-D"):
 
 def getD4calc(xc="pbe"):
     from dftd4.ase import DFTD4
-    return DFTD4(method=xc)
+    procid = current_process()
+    return DFTD4(
+        label="tmp_d3_%s" % procid.pid,
+        method=xc
+    )
 
 
 def setG16Calculator():
@@ -111,6 +115,14 @@ def load_calculators(model_names, device):
             sys.exit(1)
         else:
             models["dftd3"] = getD3calc()
+    if "dftd4" in model_names:
+        if shutil.which("dftd4") is None:
+            print("dftd4 program CAN NOT FOUND !!!")
+            print("You can install dftd4 by running the following command in command line")
+            print("conda install -c conda-forge dftd4")
+            sys.exit(1)
+        else:
+            models["dftd4"] = getD4calc()
     if "g16" in model_names:
         if shutil.which("g16") is None:
             print("g16 program CAN NOT FOUND !!!")
