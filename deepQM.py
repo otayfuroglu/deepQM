@@ -66,12 +66,32 @@ def calcSPWithModel(calculator, mol):
 
 def getD3calc(xc="pbe"):
     from ase.calculators.dftd3 import DFTD3
-    procid = current_process()
+    procid = current_process().pid
+    workdir = f"ase_dft{procid}"
 
+    # due to ase bug, chdir working dir and comment out label and directory
+    pwd = os.getcwd()
+    if os.path.exists(workdir):
+        shutil.rmtree(workdir)
+    os.mkdir(workdir)
+    os.chdir(workdir)
+
+    params = {'s6': 1.0, 's9': 1.0, 'alp': 16.0, 's8': 0.6633, 'a1': 0.4288, 'a2': 3.9935}
     return DFTD3(
-        label="tmp_d3_%s" % procid.pid,
+        #  label="tmp_d3",
+        #  directory=procid,
         xc=xc
+        #  damping="bj",
+        #  a1=0.4288,
+        #  a2=3.9935,
+        #  s6=1.0,
+        #  #  s9=1.0,
+        #  alpha6=16.0,
+        #  s8=0.6633,
+        
     )
+    os.chdir(pwd)
+    shutil.rmtree("ase_dft*") #intesting run after retunr statement
 
 
 def getD4calc(xc="pbe"):
