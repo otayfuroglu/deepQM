@@ -49,6 +49,16 @@ Returned 0.0 for energy"""
 
 def calcSPWithModel(calculator, mol):
 
+    procid = current_process().pid
+    workdir = f"ase_dftd3{procid}"
+    pwd = os.getcwd()
+
+    # due to ase bug, chdir working dir and comment out label and directory
+    if os.path.exists(workdir):
+        shutil.rmtree(workdir)
+    os.mkdir(workdir)
+    os.chdir(workdir)
+
     mol.set_calculator(calculator)
 
     # check atom type for ani2x
@@ -57,30 +67,22 @@ def calcSPWithModel(calculator, mol):
     #  if len(ani2_atom_type) >= 1:
     #      return 0.0
 
-    # try:
-    return np.round(mol.get_potential_energy(), 6)
-    # except:
-    #     print(warning)
-    #     return 0.0
-
+    try:
+        sp_e =  np.round(mol.get_potential_energy(), 6)
+    except:
+       print(warning)
+       return 0.0
+    finally:
+        os.chdir(pwd)
+        shutil.rmtree(workdir) #intesting run after retunr statement
+        return sp_e
 
 def getD3calc(xc="pbe"):
     from ase.calculators.dftd3 import DFTD3
-    procid = current_process().pid
-    workdir = f"ase_dft{procid}"
-
-    # due to ase bug, chdir working dir and comment out label and directory
-    pwd = os.getcwd()
-    if os.path.exists(workdir):
-        shutil.rmtree(workdir)
-    os.mkdir(workdir)
-    os.chdir(workdir)
-
-    params = {'s6': 1.0, 's9': 1.0, 'alp': 16.0, 's8': 0.6633, 'a1': 0.4288, 'a2': 3.9935}
     return DFTD3(
         #  label="tmp_d3",
-        #  directory=procid,
-        xc=xc
+        #  directory=workdir,
+        xc=xc,
         #  damping="bj",
         #  a1=0.4288,
         #  a2=3.9935,
@@ -88,27 +90,20 @@ def getD3calc(xc="pbe"):
         #  #  s9=1.0,
         #  alpha6=16.0,
         #  s8=0.6633,
-        
     )
-    os.chdir(pwd)
-    shutil.rmtree("ase_dft*") #intesting run after retunr statement
 
 
 def getD4calc(xc="pbe"):
     from dftd4.ase import DFTD4
-    procid = current_process()
     return DFTD4(
-        label="tmp_d3_%s" % procid.pid,
         method=xc
     )
 
 
 def setG16Calculator():
     from ase.calculators.gaussian import Gaussian
-    procid = current_process()
 
     calculator = Gaussian(
-        label="tmp_g16/%s" % procid.pid,
         #  chk="tmp.chk",
         xc="wb97x",
         basis="6-31g*",
@@ -355,6 +350,7 @@ def runOptSingleMol(file_base, device):
     mol_path = structure_dir + "/" + file_base + ".xyz"
     mol = read(mol_path)
 
+    # optimize with ani2x
     ani2x = torchani.models.ANI2x().to(device).ase()
     mol.set_calculator(ani2x)
 
