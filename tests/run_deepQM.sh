@@ -11,28 +11,28 @@ PYTHON_DIR="$HOME/miniconda3/bin"
 calcMode=sp_grouped_multi_mol
 
 # set number of processors
-n_procs=1
+n_procs=2
 
 # define model/s: Available model_list="ani1x ani1ccx ani2x aimnetgas aimnetsmd"
-model_list="dftd3"
+model_list="ani2x dftd3"
 
 
-# struct_dir  # pdb files directory
-struct_dir=test_1
+# struct_dir  # includes pdb files dir. NOTE, This directory path must entires as full path
+struct_dir=/cta/users/otayfuroglu/workspace/deepQM/tests/pdb_pro_lig
 
 
 # namebase 
-namebase=4j0y_
+namebase=trjmol
 
 
 # set sequence of start (default=0) pose sarting number
 # set sequence of end (default=1E6) pose ending number
-seq_start=1
-seq_end=2
+seq_start=0
+seq_end=6
 
 
 # groups index file
-index_file_path="$struct_dir/index.ndx"
+index_file_path=$struct_dir/index_new.ndx
 # index_file_path="None"
 
 # set group1 M23\ protein keyword in pdb
