@@ -50,7 +50,7 @@ Returned 0.0 for energy"""
 def calcSPWithModel(calculator, mol):
 
     procid = current_process().pid
-    workdir = f"ase_dftd3{procid}"
+    workdir = f"ase_tmp{procid}"
     pwd = os.getcwd()
 
     # due to ase bug, chdir working dir and comment out label and directory
