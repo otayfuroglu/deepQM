@@ -405,6 +405,10 @@ def runOptGroupedMultiMol(n_procs, thr_fmax):
 
 def _OptMultiMol(idx):
 
+    file_names = _getFilenames()
+    file_name = file_names[idx]
+    file_base = file_name.replace(".pdb", "")
+    prepare_xyz_files(structure_dir, file_base)
     device = _getDevices(idx)
 
     file_names = _getFilenames()
@@ -443,6 +447,9 @@ def runOptMultiMol(n_procs, thr_fmax):
 
     csv_path = _getcsvPath()
     df_results.to_csv(csv_path)
+
+    pool = Pool(processes=n_procs)
+    result_list_tqdm = []
 
     #  # to optimizing strucututes
     #  with Pool(n_procs) as pool:
