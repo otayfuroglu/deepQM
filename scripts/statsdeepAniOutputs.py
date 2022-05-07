@@ -7,7 +7,7 @@ import argparse
 OUTPUT_DIR = "./"
 EV2KT = 38.94
 KT2KCAL = 0.593
-method_list = ["avg", "exp", "jar", "cumu"]
+method_list = ["AVG", "EXP", "nc-EXP", "cu-EXP"]
 
 
 parser = argparse.ArgumentParser(description="Give something ...")
