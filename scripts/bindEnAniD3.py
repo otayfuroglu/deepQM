@@ -69,9 +69,9 @@ if __name__ == "__main__":
     print("="*61)
     print("{:^61s}".format("SUMMARY"))
     print("="*61)
-    if beta != 0.0:
+    if alpha != 0.0:
         print("DFTD3 (wb97x)            =   {:10.6f}    +/-     {:10.6f}".format(diff_dftd3En, diff_dftd3Std))
-    if alpha != 1.0:
+    if beta != 0.127:
         print("{} (wb97x/6-31G*)    =   {:10.6f}    +/-     {:10.6f}".format(ani_method, diff_aniEn, diff_aniStd))
     print("-"*61)
     print("Binding energy           =   {:10.6f}    +/-     {:10.6f}".format(bindEn, bindEnStd))
