@@ -36,6 +36,7 @@ if __name__ == "__main__":
     ani_method = args.ani_method
     alpha = args.alpha
     beta = args.beta
+    gamma=args.gamma
 
     df = pd.read_csv(csv_path)
     column_names = df.columns
@@ -51,7 +52,7 @@ if __name__ == "__main__":
 
 
     diff_dftd3 = 0.0
-    if beta != 0.0:
+    if alpha != 0.0:
         if "diff_dftd3" not in column_names:
             print("Error: Not found dftd3 in methods")
             sys.exit()
