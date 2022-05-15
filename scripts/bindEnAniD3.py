@@ -67,7 +67,7 @@ if __name__ == "__main__":
     bindEnStd = std(data_bindEn)
 
     print("="*61)
-    print("{:^61s}".format("SUMMARY"))
+    print("{:^61s}".format("SUMMARY-kcal/mol"))
     print("="*61)
     if alpha != 0.0:
         print("DFTD3 (wb97x)            =   {:10.6f}    +/-     {:10.6f}".format(diff_dftd3En, diff_dftd3Std))
