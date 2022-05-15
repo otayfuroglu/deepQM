@@ -27,7 +27,7 @@ conda install -c psi4 dftd3
 
 git clone https://github.com/otayfuroglu/deepQM.git
 
-deepQ/tests/run_deepQM.sh 
+cd deepQ/tests/run_deepQM.sh 
 ```
 # How To Use
 
