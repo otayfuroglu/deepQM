@@ -70,8 +70,9 @@ set thrshold fmax for optimization (default=0.01). Only used in optimization typ
 Maximum iteration for optimization. Only used in optimization types of calculators
 
 ### run script by:
+```
 $PYTHON_DIR/python $deepQM_DIR/deepQM.py $calcMode $n_procs $model_list $struct_dir $namebase $seq_start $seq_end $index_file_path $group1 $group2 $thr_fmax $maxiter
-
+```
 ## Tutorial-1: Ligand solvation free energy from ligand+water (LS) simulations
 
 
