@@ -10,7 +10,7 @@ PYTHON_DIR="$HOME/miniconda3/bin"
 # opt_grouped_multi_mol, opt_single_mol, opt_multi_mol
 calcMode=sp_grouped_multi_mol
 
-# set number of processors
+# set number of processors. It can be GPU or CPU. If using GPU, the GPU-RAM may be limitatition so reduce n_procs for such cases.
 n_procs=2
 
 # define model/s: Available model_list="ani1x ani1ccx ani2x aimnetgas aimnetsmd"
@@ -28,7 +28,7 @@ namebase=trjmol
 # set sequence of start (default=0) pose sarting number
 # set sequence of end (default=1E6) pose ending number
 seq_start=0
-seq_end=6
+seq_end=1001
 
 
 # groups index file
