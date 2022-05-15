@@ -15,9 +15,11 @@ parser.add_argument("-in", "--csv_path", type=str, required=True,
 parser.add_argument("-ani", "--ani_method", type=str, required=True,
                     help="Enter one of the ani versions (ani1x, ani1ccs or ani2x)")
 parser.add_argument("-a", "--alpha", type=float, default=1.0, required=False,
-                    help="Enter alpha constant")
-parser.add_argument("-b", "--beta", type=float, default=0.0, required=False,
-                    help="Enter beta constant")
+                    help="Enter alpha coefficient for ani")
+parser.add_argument("-b", "--beta", type=float, default=0.127, required=False,
+                    help="Enter beta coefficient for d3")
+parser.add_argument("-g", "--gamma", type=float, default=-5.111, required=False,
+                    help="Enter gamma coefficient for intercept")
 args = parser.parse_args()
 
 
@@ -59,7 +61,7 @@ if __name__ == "__main__":
         diff_dftd3En = avg(diff_dftd3)
         diff_dftd3Std = std(diff_dftd3)
 
-    data_bindEn = diff_ani * alpha  + diff_dftd3 * beta
+    data_bindEn = diff_dftd3 * alpha  + diff_ani * beta + gamma
     bindEn = avg(data_bindEn)
     bindEnStd = std(data_bindEn)
 
