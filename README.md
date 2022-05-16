@@ -93,15 +93,15 @@ After MD simulations for protein-ligand aqueous complex (PLS), MD frames can be 
 mkdir pdb_pro_lig
 echo 24 24 | gmx trjconv -f md_0.xtc -s md_0.tpr -n index.ndx -o pdb_pro_lig/trjmol.pdb -pbc nojump -ur compact -center -sep
 ```
-Here index group 24 is the Protein_Ligand complex while 1 is the protein and 13 is the ligand. You can use -dt option to reduce number of frames to calculate. Let's say we have 1000 frames (trjmol0.pdb, trjmol1.pdb, ... trjmol1000.pdb) extracted into a directory name of ./pdb_pro_lig/
+Here index group 24 is the Protein_Ligand complex while 1 is the protein and 13 is the ligand. You can use -dt option to reduce number of frames to calculate. We prefer to have at least 100-200 frames. Let's say we have 1000 frames (trjmol0.pdb, trjmol1.pdb, ... trjmol1000.pdb) extracted into a directory name of ./pdb_pro_lig/.
 ```
-bash run_deepQM.sh [here](tests/run_deepQM.sh)
+bash run_deepQM.sh
 ```
 After running this command, it will create a csv file in the same directory of ./pdb_pro_lig/. This file includes all frames for each group and energy differences written in eVs without fitting coefficients.
 ```
 $PYTHON_DIR/python $deepQM_DIR/scripts/bindEnAniD3.py -in "$struct_dir"/"$namebase"_SP_energies_"$group1"_"$group2".csv -ani ani2x -a 0.0 -b 0.127 -g -5.111
 ```
-This script collects the data from the csv file previously produced and converts to free energies with coefficients determined from fit to the experimental energies
+An example run script can be found in [here](tests/run_deepQM.sh) This script collects the data from the csv file previously produced and converts to free energies with coefficients determined from fit to the experimental energies
 
 
 
