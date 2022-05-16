@@ -73,6 +73,10 @@ Maximum iteration for optimization. Only used in optimization types of calculato
 ```
 $PYTHON_DIR/python $deepQM_DIR/deepQM.py $calcMode $n_procs $model_list $struct_dir $namebase $seq_start $seq_end $index_file_path $group1 $group2 $thr_fmax $maxiter
 ```
+### analyze results by: 
+```
+$PYTHON_DIR/python $deepQM_DIR/scripts/bindEnAniD3.py -in "$struct_dir"/"$namebase"_SP_energies_"$group1"_"$group2".csv -ani ani2x -a 0.0 -b 0.127 -g -5.111
+```
 ## Tutorial-1: Ligand solvation free energy from ligand+water (LS) simulations
 
 
@@ -81,11 +85,6 @@ $PYTHON_DIR/python $deepQM_DIR/deepQM.py $calcMode $n_procs $model_list $struct_
 Although it has been shown that the solvent effects bring little improvements to the accuracy of the calculations, we will provide tutorials for both methods.
 
 ### a) Ignoring solvent effects
-
-
-
-
-#### i) ANI only
 
 After MD simulations for protein-ligand aqueous complex (PLS), MD frames can be extracted by using Gromacs trjconv with -sep command in to seperate files. An example MD simulation with trajectory and index file can be found [here](). It is better to create a directory for these frames. We have to make sure periodic boundary condition is removed from trajectory
 
@@ -98,18 +97,19 @@ Here index group 24 is the Protein_Ligand complex while 1 is the protein and 13 
 bash run_deepQM.sh
 ```
 After running this command, it will create a csv file in the same directory of ./pdb_pro_lig/. This file includes all frames for each group and energy differences written in eVs without fitting coefficients.
-```
-$PYTHON_DIR/python $deepQM_DIR/scripts/bindEnAniD3.py -in "$struct_dir"/"$namebase"_SP_energies_"$group1"_"$group2".csv -ani ani2x -a 0.0 -b 0.127 -g -5.111
-```
-An example run script can be found in [here](tests/) This script collects the data from the csv file previously produced and converts to free energies with coefficients determined from fit to the experimental energies
+
+This script collects the data from the csv file previously produced and converts to free energies with coefficients determined from fit to the experimental energies. 
+
+DG=alpha*<diff_dftd3>+beta*<diff_ani2x>+gamma formula is used in the calculations.
+
+For ANI_LIE: alpha=0.000, beta=0.127 and gamma=5.111. For ANID3_LIE: alpha=-0.0353, beta=0.1487 and gamma=5.9866. Experimental values are detrmined from fit. The values may change slightly according to differen system.
+
+
+An example run script with default parameters can be found in [here](tests/) 
 
 
 
 
-
-
-
-#### ii) ANI-D3
 
 ### b) Including solvent effects
 
