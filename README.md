@@ -102,7 +102,7 @@ This script collects the data from the csv file previously produced and converts
 
 DG=alpha*<diff_dftd3>+beta*<diff_ani2x>+gamma formula is used in the calculations.
 
-For ANI_LIE: alpha=0.000, beta=0.127 and gamma=5.111. For ANID3_LIE: alpha=-0.0353, beta=0.1487 and gamma=5.9866. Experimental values are detrmined from fit. The values may change slightly according to differen system.
+For ANI_LIE: alpha=0.000, beta=0.127 and gamma=-5.111. For ANID3_LIE: alpha=-0.0353, beta=0.1487 and gamma=-5.9866. Experimental values are detrmined from fit. The values may change slightly according to differen system.
 
 
 An example run script with default parameters can be found in [here](tests/) 
@@ -113,13 +113,13 @@ An example run script with default parameters can be found in [here](tests/)
 
 ### b) Including solvent effects
 
+In order to account for solvation terms, we need another MD simulation of free ligand in water. We will find the binding energy in two steps.
+
+#### i) LS simulation
+
 coming soon
 
-#### i) ANI only
-
-coming soon
-
-#### ii) ANI-D3
+#### ii) PLS simulation
   
 coming soon
   
