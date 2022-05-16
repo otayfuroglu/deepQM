@@ -101,7 +101,7 @@ After running this command, it will create a csv file in the same directory of .
 ```
 $PYTHON_DIR/python $deepQM_DIR/scripts/bindEnAniD3.py -in "$struct_dir"/"$namebase"_SP_energies_"$group1"_"$group2".csv -ani ani2x -a 0.0 -b 0.127 -g -5.111
 ```
-An example run script can be found in [here](tests/run_deepQM.sh) This script collects the data from the csv file previously produced and converts to free energies with coefficients determined from fit to the experimental energies
+An example run script can be found in [here](tests/) This script collects the data from the csv file previously produced and converts to free energies with coefficients determined from fit to the experimental energies
 
 
 
