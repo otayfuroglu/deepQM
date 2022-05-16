@@ -68,7 +68,7 @@ def calcSPWithModel(calculator, mol):
     #      return 0.0
 
     try:
-        sp_e =  np.round(mol.get_potential_energy(), 6)
+        sp_e =  np.round(mol.get_potential_energy(), 16)
     except:
        print(warning)
        return 0.0
