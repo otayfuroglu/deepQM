@@ -31,41 +31,41 @@ cp deepQ/tests/run_deepQM.sh <working-dir>
 ```
 # How To Use
 
-deepQM.py is the main pyhton script that does the calculations. It can be called from run_deepQM.sh file in which a set of parameters are predefined and can ben customized according to the calculation type.
+deepQM.py is the main pyhton script that does the calculations. It can be called from run_deepQM.sh file in which a set of parameters are predefined and can be customized according to the calculation type.
 
 ## Parameters
 ### calcMode
-There are several types of calculation modes: sp_single_mol, sp_multi_mol, sp_grouped_multi_mol, opt_grouped_multi_mol, opt_single_mol, opt_multi_mol
+There are several types of calculation modes: sp_single_mol, sp_multi_mol, sp_grouped_multi_mol, opt_grouped_multi_mol, opt_single_mol, opt_multi_mol. Default is sp_grouped_multi_mol.
 
 sp_single_mol:single point energy of a single pdb file
 
-sp_multi_mol: single point energy of a multiple pdb files. It calls sp_single_mol for all compounds in a directory
+sp_multi_mol: single point energy of multiple pdb files. It calls sp_single_mol for all pdb files in a directory.
 
 sp_grouped_multi_mol: single point energy of a multiple compounds which runs the sp_single_mol three times and finds differences between two groups (group A and group B) and it performs the same calculation for multiple pdb files
 
-opt_single_mol: it performs geometry optimization for a single pdb file
+opt_single_mol: geometry optimization for a single pdb file
 
-opt_multi_mol: it performs geometry optimization for multiple pdb files
+opt_multi_mol: geometry optimization for multiple pdb files
 
 ### model_list
-This sets the calculator type currently ani1x, ani1ccx, ani2x, dftd3 and g16 calculators are provided. More than one type of calculators can be set. The resulting csv file will print all the modellist.
+This sets the calculator type. Currently ani1x, ani1ccx, ani2x, dftd3 and g16 calculators are provided. More than one type of calculators can be set. The resulting csv file will print all the model_list calculator results. The default is ani2x
 ### struct_dir
 This tells where the pdb files are. Explicit directory or subdirectories can be defined.
 ### namebase
-This tells what the base name of the pdb files. When the trajectory is extracted in to multiple files the file name excluding the frame number is given here.
+This tells what the base name of the pdb files are. When the trajectory is extracted in to multiple files, the file name excluding the frame number is given here. (e.g. trjmol1.pdb, trjmol2.pdb,... basename=trjmol)
 This name is only required when sequential file names are given with seq_start and seq_end commands.
 ### seq_start
-sets sequence of start (default=0) frame starting number. 
+sets frame starting number for the basename (default=0). 
 ### seq_end
 sets frame ending number (default=1000). if -1 is given, it calculates all the pdb files in the struct_dir without caring namebase.
 ### index_file_path
-Group index file in Gromacs format. Any two groups can be chosen from index file. Required when "group" types of calculators. Groups are defined in the following lines
+Group index file in Gromacs format. Any two groups can be chosen from index file. Required when "group" types of calculators are set. Groups are defined in the following lines
 ### group1
 Group A in AB-->A+B calculation Default is 1 for protein in MD simulations
 ### group2
 Group B in AB-->A+B calculation Default is 13 for ligand in MD simulations
 ### thr_fmax
-set thrshold fmax for optimization (default=0.01). Only used in optimization types of calculators
+sets thrshold fmax for optimization (default=0.01). Only used in optimization types of calculators
 ### maxiter
 Maximum iteration for optimization. Only used in optimization types of calculators
 
