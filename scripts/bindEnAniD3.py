@@ -66,14 +66,16 @@ if __name__ == "__main__":
     bindEn = avg(data_bindEn)
     bindEnStd = std(data_bindEn)
 
-    print("="*61)
-    print("{:^61s}".format("SUMMARY-kcal/mol"))
-    print("="*61)
-    if alpha != 0.0:
-        print("DFTD3 (wb97x)            =   {:10.6f}    +/-     {:10.6f}".format(diff_dftd3En, diff_dftd3Std))
-    if beta != 0.127:
-        print("{} (wb97x/6-31G*)    =   {:10.6f}    +/-     {:10.6f}".format(ani_method, diff_aniEn, diff_aniStd))
-    print("-"*61)
-    print("Binding energy           =   {:10.6f}    +/-     {:10.6f}".format(bindEn, bindEnStd))
-    print("-"*61)
-    print("="*61)
+    with open('Summary.dat','w') as f:
+
+        print("="*61,file=f)
+        print("{:^61s}".format("SUMMARY-kcal/mol"),file=f)
+        print("="*61,file=f)
+        if alpha != 0.0:
+            print("DFTD3 (wb97x)            =   {:10.6f}    +/-     {:10.6f}".format(diff_dftd3En, diff_dftd3Std),file=f)
+        if beta != 0.127:
+            print("{} (wb97x/6-31G*)    =   {:10.6f}    +/-     {:10.6f}".format(ani_method, diff_aniEn, diff_aniStd),file=f)
+        print("-"*61,file=f)
+        print("Binding energy           =   {:10.6f}    +/-     {:10.6f}".format(bindEn, bindEnStd),file=f)
+        print("-"*61,file=f)
+        print("="*61,file=f)
