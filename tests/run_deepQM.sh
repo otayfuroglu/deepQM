@@ -32,11 +32,11 @@ seq_end=1001
 
 
 # groups index file
-index_file_path=$struct_dir/index_new.ndx
+index_file_path=$struct_dir/index.ndx
 # index_file_path="None"
 
-# set group1 M23\ protein keyword in pdb
-# set group2 (default=SOL) lig or sol keyword in pdb
+# set group1  (default=Protein) keyword in index
+# set group2 (default=SOL) lig or sol keyword in index
 group1="1"
 group2="13"
 
