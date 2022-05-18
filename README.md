@@ -153,7 +153,7 @@ After reducing the system size, the rest is the same as LS simulations using [th
 
 #### step-3) PLS simulation for PLinPLS
 
-Although, this part is mostly discussed in [PL simulation](tests/PL/), we have added another directory of [PLS simulation](tests/PLS/). The last line in the [script] (tests/PLS/run_deepQM_PLS.sh) will be modified to add two terms "-ls_in_ls" and "-ls_in_pls". We have added this script to reflect this modification.
+Although, this part is mostly discussed in [PL simulation](tests/PL/), we have added another directory of [PLS simulation](tests/PLS/). The last line in the [script](tests/PLS/run_deepQM_PLS.sh) will be modified to add two terms "-ls_in_ls" and "-ls_in_pls". We have added this script to reflect this modification.
 
 It will print the results in Summary.dat file.
  
