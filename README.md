@@ -127,15 +127,21 @@ For ANI_LIE: alpha=0.000, beta=0.127 and gamma=-5.111. For ANID3_LIE: alpha=-0.0
 
 ### b) Including solvent effects
 
-In order to account for solvation terms, we need another MD simulation of free ligand in water (LS simulation) in addition to Protein+ligand+water (PLS) simulation. We will find the binding energy in two steps.
+In order to account for solvation terms, we need another MD simulation of free ligand in water (LS simulation) in addition to Protein+ligand+water (PLS) simulation. We will find the binding energy in three steps.
 
-#### i) LS simulation
+#### step-1) LS simulation for LSinLS
 
-This part is already discussed in [LS simulation](https://github.com/otayfuroglu/deepQM#tutorial-1-ligand-solvation-free-energy-from-ligandwater-ls-simulations)
+This part is already discussed in [LS simulation](https://github.com/otayfuroglu/deepQM#tutorial-1-ligand-solvation-free-energy-from-ligandwater-ls-simulations). Obtained result, which we call LSinLS from [this script](tests/LS/run_deepQM.sh) will be used in step-3.
 
-#### ii) PLS simulation
+#### step-2) PLS simulation for LSinPLS
   
-coming soon
+Ideally, after running PLS simulaions, you can calculate L-surr by creating groups of L vs PS from the PLS simulations. Equivalently, you can use L vs P and L vs S. You will need to run the script twice for the P-L and L-S interactions by creating corresponding index groups. The second way requires less memory use in the computations, so we will go with this one. Having all waters in the index groups is still too costly in particular for DFTD3 calculations. Here we will use reduced systems (considering only 4A waters around the PL complex) but if the RAM of your GPU/CPU allows you can use all waters.
+
+
+
+In the first run, you will still run the same script discussed in [LS simulation](https://github.com/otayfuroglu/deepQM#tutorial-1-ligand-solvation-free-energy-from-ligandwater-ls-simulations)
+
+  
   
 
   
