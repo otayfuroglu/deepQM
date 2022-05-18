@@ -16,7 +16,7 @@ model_list="ani2x dftd3"
 
 # struct_dir  # pdb files directory
 ### struct_dir=$(pwd)/pdb
-struct_dir=$(pwd)/pdb_pro_lig
+struct_dir=$(pwd)/pdb_lig_sol
 
 # namebase 
 namebase=trjmol
