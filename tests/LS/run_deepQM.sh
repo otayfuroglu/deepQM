@@ -1,4 +1,8 @@
 #! /usr/bin/env bash
+# You can run the script on CUDA or CPU
+export CUDA_VISIBLE_DEVICES=0  # one GPU usage
+# export CUDA_VISIBLE_DEVICES=""  # run on CPU
+
 
 deepQM_DIR="/cta/users/eakkus/deepQM"
 PYTHON_DIR="/cta/users/eakkus/miniconda3/envs/automd/bin"
@@ -8,13 +12,13 @@ PYTHON_DIR="/cta/users/eakkus/miniconda3/envs/automd/bin"
 # opt_grouped_multi_mol, opt_single_mol, opt_multi_mol
 calcMode=sp_grouped_multi_mol
 
-# set number of processors
-n_procs=1
+# set number of processors. It can be GPU or CPU. If using GPU, the GPU-RAM may be limitatition so reduce n_procs for such cases.
+n_procs=2
 
 # define model/s: Available model_list="ani1x ani1ccx ani2x aimnetgas aimnetsmd"
 model_list="ani2x dftd3"
 
-# struct_dir  # pdb files directory
+# struct_dir  # pdb files directory. # includes pdb files dir. 
 ### struct_dir=$(pwd)/pdb
 struct_dir=$(pwd)/pdb_lig_sol
 
