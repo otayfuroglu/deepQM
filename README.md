@@ -127,11 +127,11 @@ For ANI_LIE: alpha=0.000, beta=0.127 and gamma=-5.111. For ANID3_LIE: alpha=-0.0
 
 ### b) Including solvent effects
 
-In order to account for solvation terms, we need another MD simulation of free ligand in water. We will find the binding energy in two steps.
+In order to account for solvation terms, we need another MD simulation of free ligand in water (LS simulation) in addition to Protein+ligand+water (PLS) simulation. We will find the binding energy in two steps.
 
 #### i) LS simulation
 
-coming soon
+This part is already discussed in [LS simulation](https://github.com/otayfuroglu/deepQM#tutorial-2-ligand-binding-free-energy-from-proteinligandwater-pls-simulations)
 
 #### ii) PLS simulation
   
