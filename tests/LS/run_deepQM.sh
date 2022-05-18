@@ -26,9 +26,9 @@ struct_dir=$(pwd)/pdb_lig_sol
 namebase=trjmol
 
 # set sequence of start (default=0) pose sarting number
-# set sequence of end (default=1E6) pose ending number
+# set sequence of end (default=1001) pose ending number
 seq_start=0
-seq_end=11
+seq_end=1001
 ###-1 process all pdb files in pdb directory :)
 
 # groups index file
