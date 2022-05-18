@@ -1,7 +1,12 @@
 #! /usr/bin/env bash
+# You can run the script on CUDA or CPU
+export CUDA_VISIBLE_DEVICES=0  # one GPU usage
+# export CUDA_VISIBLE_DEVICES=""  # run on CPU
+
 
 deepQM_DIR="/cta/users/eakkus/deepQM"
 PYTHON_DIR="/cta/users/eakkus/miniconda3/envs/automd/bin"
+
 
 #- set calculation
 # Mode: Options -> sp_single_mol, sp_multi_mol, sp_grouped_multi_mol,
@@ -9,7 +14,7 @@ PYTHON_DIR="/cta/users/eakkus/miniconda3/envs/automd/bin"
 calcMode=sp_grouped_multi_mol
 
 # set number of processors
-n_procs=1
+n_procs=2
 
 # define model/s: Available model_list="ani1x ani1ccx ani2x aimnetgas aimnetsmd"
 model_list="ani2x dftd3"
