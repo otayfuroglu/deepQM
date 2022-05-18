@@ -152,14 +152,6 @@ To reduce your system size, you can use following Gromacs trjorder command. But 
 
 In the first run, you will still run the same script discussed in [LS simulation](https://github.com/otayfuroglu/deepQM#tutorial-1-ligand-solvation-free-energy-from-ligandwater-ls-simulations)
 
-  
-
-![formula](https://render.githubusercontent.com/render/math?math=e^{i \pi} = -1)
-
-  
-
-
-
  
  
 
