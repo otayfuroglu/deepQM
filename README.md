@@ -79,6 +79,25 @@ $PYTHON_DIR/python $deepQM_DIR/scripts/bindEnAniD3.py -in "$struct_dir"/"$nameba
 ```
 ## Tutorial-1: Ligand solvation free energy from ligand+water (LS) simulations
 
+After MD simulations for ligand aqueous complex (LS), MD frames can be extracted by using Gromacs trjconv with -sep command in to seperate files. An example MD simulation with trajectory and index file can be found [here](tests/LS/). It is better to create a directory for these frames (pdb_lig_sol). We have to make sure periodic boundary condition is removed from trajectory.
+
+```
+mkdir pdb_lig_sol
+echo 2 0 | gmx trjconv -f md_0.xtc -s md_0.tpr -n index.ndx -o pdb_lig_sol/trjmol.pdb -pbc mol -ur compact -center -sep
+```
+Here index group 2 is the ligand while 0 is the system. You can use -dt option to reduce number of frames to calculate. We prefer to have at least 100-200 frames. Let's say we have 1000 frames (trjmol0.pdb, trjmol1.pdb, ... trjmol1000.pdb) extracted into a directory name of ./pdb_lig_sol/.
+```
+bash run_deepQM.sh
+```
+After running this command, it will create a csv file in the same directory of ./pdb_lig_sol/. This file includes all frames for each group and energy differences written in eVs without fitting coefficients.
+
+The last line of the script collects the data from the csv file previously produced and converts to free energies with coefficients determined from fit to the experimental energies using AVG/ANI_LIE. 
+
+DG=alpha*<diff_dftd3>+beta*<diff_ani2x>+gamma formula is used in the calculations.
+
+For ANI_LIE: alpha=0.000, beta=0.272 and gamma=-2.164. For ANID3_LIE: alpha=-0.057, beta=0.208 and gamma=-1.230. Experimental values are detrmined from fit. The values may change slightly according to differen system.
+
+If the user wants to calculate 4 other methods, we have a separate script that can calculate all different methods [here](scripts/statsdeepAniOutputs.py). 
 
 ## Tutorial-2: Ligand binding free energy from Protein+ligand+water (PLS) simulations
 
@@ -98,16 +117,11 @@ bash run_deepQM.sh
 ```
 After running this command, it will create a csv file in the same directory of ./pdb_pro_lig/. This file includes all frames for each group and energy differences written in eVs without fitting coefficients.
 
-This script collects the data from the csv file previously produced and converts to free energies with coefficients determined from fit to the experimental energies. 
+The last line of the script collects the data from the csv file previously produced and converts to free energies with coefficients determined from fit to the experimental energies. 
 
 DG=alpha*<diff_dftd3>+beta*<diff_ani2x>+gamma formula is used in the calculations.
 
 For ANI_LIE: alpha=0.000, beta=0.127 and gamma=-5.111. For ANID3_LIE: alpha=-0.0353, beta=0.1487 and gamma=-5.9866. Experimental values are detrmined from fit. The values may change slightly according to differen system.
-
-
-An example run script with default parameters can be found in [here](tests/) 
-
-
 
 
 
