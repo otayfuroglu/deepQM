@@ -50,4 +50,4 @@ echo "SOL    $nwater" >> topol_sol_number.top
 mkdir pdb_pro_lig_sol
 
 # we need to convert xtc file to new xtc file including only PL + 4A SOL from ordered trajectory
-echo 0 | gmx trjconv -f pls.xtc -s min_steep_0.tpr -o pdb_pro_lig_sol/trjmol.pdb -n index_4A.ndx -sep
+echo 0 | gmx trjconv -f pls.xtc -s min_steep_0.tpr -o pdb_pro_lig_sol/pls.pdb -n index_4A.ndx -sep
