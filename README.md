@@ -137,6 +137,13 @@ This part is already discussed in [LS simulation](https://github.com/otayfuroglu
   
 Ideally, after running PLS simulaions, you can calculate L-surr by creating groups of L vs PS from the PLS simulations. Equivalently, you can use L vs P and L vs S. You will need to run the script twice for the P-L and L-S interactions by creating corresponding index groups. The second way requires less memory use in the computations, so we will go with this one. Having all waters in the index groups is still too costly in particular for DFTD3 calculations. Here we will use reduced systems (considering only 4A waters around the PL complex) but if the RAM of your GPU/CPU allows you can use all waters.
 
+To reduce your system size, you can use following Gromacs trjorder command. But be aware that new index groups for these need to be generated for this reduced system. We have a [script](tests/PLS/PLS_4A.sh) that does 
+-remove periodicity
+-order trajectory
+-assign number of solvents for 4A around PL complex
+-generate new index group for solvents within 4A
+-create trajectory of reduced system
+
 
 
 In the first run, you will still run the same script discussed in [LS simulation](https://github.com/otayfuroglu/deepQM#tutorial-1-ligand-solvation-free-energy-from-ligandwater-ls-simulations)
