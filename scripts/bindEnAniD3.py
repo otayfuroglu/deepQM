@@ -20,6 +20,10 @@ parser.add_argument("-b", "--beta", type=float, default=0.127, required=False,
                     help="Enter beta coefficient for d3")
 parser.add_argument("-g", "--gamma", type=float, default=-5.111, required=False,
                     help="Enter gamma coefficient for intercept")
+parser.add_argument("-ls_in_ls", "--ls_in_ls", type=float, default=0, required=False,
+                    help="Enter gamma coefficient for intercept")
+parser.add_argument("-ls_in_pls", "--ls_in_pls", type=float, default=0, required=False,
+                    help="Enter gamma coefficient for intercept")
 args = parser.parse_args()
 
 
@@ -37,6 +41,9 @@ if __name__ == "__main__":
     alpha = args.alpha
     beta = args.beta
     gamma=args.gamma
+    #sim_type = args.sim_type
+    ls_in_ls = args.ls_in_ls
+    ls_in_pls = args.ls_in_pls
 
     df = pd.read_csv(csv_path)
     column_names = df.columns
@@ -62,19 +69,26 @@ if __name__ == "__main__":
         diff_dftd3En = avg(diff_dftd3)
         diff_dftd3Std = std(diff_dftd3)
 
-    data_bindEn = diff_dftd3 * alpha  + diff_ani * beta + gamma
+
+    if ls_in_ls == 0 or ls_in_pls == 0:
+        data_bindEn = diff_dftd3 * alpha  + diff_ani * beta + gamma
+    else:
+        data_bindEn = (diff_dftd3 + ls_in_pls - ls_in_ls) * alpha  + (diff_ani + ls_in_pls - ls_in_ls) * beta + gamma
+
     bindEn = avg(data_bindEn)
     bindEnStd = std(data_bindEn)
-
     with open('Summary.dat','w') as f:
 
         print("="*61,file=f)
         print("{:^61s}".format("SUMMARY-kcal/mol"),file=f)
         print("="*61,file=f)
         if alpha != 0.0:
-            print("DFTD3 (wb97x)            =   {:10.6f}    +/-     {:10.6f}".format(diff_dftd3En, diff_dftd3Std),file=f)
+            print("dftd3 (wb97x)            =   {:10.6f}    +/-     {:10.6f}".format(diff_dftd3En, diff_dftd3Std),file=f)
         if beta != 0.127:
             print("{} (wb97x/6-31G*)    =   {:10.6f}    +/-     {:10.6f}".format(ani_method, diff_aniEn, diff_aniStd),file=f)
+        if ls_in_ls != 0 and ls_in_pls != 0:
+            print("ligand solvation term  from LS sim  =   {:10.6f}".format(ls_in_ls),file=f)
+            print("ligand solvation term from PLS sim   =   {:10.6f}".format(ls_in_pls),file=f)
         print("-"*61,file=f)
         print("Binding energy           =   {:10.6f}    +/-     {:10.6f}".format(bindEn, bindEnStd),file=f)
         print("-"*61,file=f)
