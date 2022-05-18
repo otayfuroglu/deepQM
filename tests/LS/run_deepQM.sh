@@ -9,7 +9,7 @@ PYTHON_DIR="/cta/users/eakkus/miniconda3/envs/automd/bin"
 calcMode=sp_grouped_multi_mol
 
 # set number of processors
-n_procs=30
+n_procs=1
 
 # define model/s: Available model_list="ani1x ani1ccx ani2x aimnetgas aimnetsmd"
 model_list="ani2x dftd3"
@@ -24,13 +24,13 @@ namebase=trjmol
 # set sequence of start (default=0) pose sarting number
 # set sequence of end (default=1E6) pose ending number
 seq_start=0
-seq_end=1001
+seq_end=11
 ###-1 process all pdb files in pdb directory :)
 
 # groups index file
 index_file_path="index.ndx"
 
-# set group1 M23\ protein keyword in pdb
+# set group1 LIG group keyword in pdb
 # set group2 (default=SOL) lig or sol keyword in pdb
 group1="2"
 group2="4"
