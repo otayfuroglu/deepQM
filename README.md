@@ -139,9 +139,13 @@ Ideally, after running PLS simulaions, you can calculate L-surr by creating grou
 
 To reduce your system size, you can use following Gromacs trjorder command. But be aware that new index groups for these need to be generated for this reduced system. We have a [script](tests/PLS/PLS_4A.sh) that does 
 -remove periodicity
+
 -order trajectory
+
 -assign number of solvents for 4A around PL complex
+
 -generate new index group for solvents within 4A
+
 -create trajectory of reduced system
 
 
