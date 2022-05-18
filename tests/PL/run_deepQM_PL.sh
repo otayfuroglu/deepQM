@@ -50,7 +50,7 @@ maxiter=5000
 
 $PYTHON_DIR/python -W ignore $deepQM_DIR/deepQM.py $calcMode $n_procs $model_list $struct_dir $namebase $seq_start $seq_end $index_file_path $group1 $group2 $thr_fmax $maxiter
 
-# For ANI_LIE: alpha=0.000, beta=0.127 and gamma=-5.111. For ANID3_LIE: alpha=-0.0353, beta=0.1487 and gamma=-5.9866. No solvent effects.
-$PYTHON_DIR/python $deepQM_DIR/scripts/bindEnAniD3.py -in "$struct_dir"/"$namebase"_SP_energies_"$group1"_"$group2".csv -ani ani2x -a 0.0 -b 0.127 -g -5.111
+# For ANI_LIE: alpha=0.000, beta=0.1064 and gamma=-4.9875. For ANID3_LIE: alpha=-0.0254, beta=0.1240 and gamma=-5.5692. No solvent effects.
+$PYTHON_DIR/python $deepQM_DIR/scripts/bindEnAniD3.py -in "$struct_dir"/"$namebase"_SP_energies_"$group1"_"$group2".csv -ani ani2x -a -0.0254 -b 0.1240 -g -5.5692
 
 
