@@ -97,7 +97,7 @@ DG=alpha*<diff_dftd3>+beta*<diff_ani2x>+gamma formula is used in the calculation
 
 For ANI_LIE: alpha=0.000, beta=0.272 and gamma=-2.164. For ANID3_LIE: alpha=-0.057, beta=0.208 and gamma=-1.230. Experimental values are detrmined from fit. The values may change slightly according to differen system.
 
-If the user wants to calculate 4 other methods, we have a separate script that can calculate all different methods [here](scripts/statsdeepAniOutputs.py). 
+If the user wants to calculate the other methods discussed elsewhere (EXP, nc-EXP and cu-EXP), we have a separate script that can calculate all different methods [here](scripts/statsdeepAniOutputs.py). 
 
 ## Tutorial-2: Ligand binding free energy from Protein+ligand+water (PLS) simulations
 
