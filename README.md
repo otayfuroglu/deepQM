@@ -131,7 +131,7 @@ In order to account for solvation terms, we need another MD simulation of free l
 
 #### i) LS simulation
 
-This part is already discussed in [LS simulation](https://github.com/otayfuroglu/deepQM#tutorial-2-ligand-binding-free-energy-from-proteinligandwater-pls-simulations)
+This part is already discussed in [LS simulation](https://github.com/otayfuroglu/deepQM#tutorial-1-ligand-solvation-free-energy-from-ligandwater-ls-simulations)
 
 #### ii) PLS simulation
   
