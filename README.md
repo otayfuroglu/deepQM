@@ -87,7 +87,7 @@ echo 2 0 | gmx trjconv -f md_0.xtc -s md_0.tpr -n index.ndx -o pdb_lig_sol/trjmo
 ```
 Here index group 2 is the ligand while 0 is the system. You can use -dt option to reduce number of frames to calculate. We prefer to have at least 100-200 frames. Let's say we have 1000 frames (trjmol0.pdb, trjmol1.pdb, ... trjmol1000.pdb) extracted into a directory name of ./pdb_lig_sol/.
 ```
-bash run_deepQM.sh
+bash run_deepQM_LS.sh
 ```
 After running this command, it will create a csv file in the same directory of ./pdb_lig_sol/. This file includes all frames for each group and energy differences written in eVs without fitting coefficients.
 
@@ -105,7 +105,7 @@ Although it has been shown that the solvent effects bring little improvements to
 
 ### a) Ignoring solvent effects
 
-After MD simulations for protein-ligand aqueous complex (PLS), MD frames can be extracted by using Gromacs trjconv with -sep command in to seperate files. An example MD simulation with trajectory and index file can be found [here](). It is better to create a directory for these frames. We have to make sure periodic boundary condition is removed from trajectory
+After MD simulations for protein-ligand aqueous complex (PLS), MD frames can be extracted by using Gromacs trjconv with -sep command in to seperate files. An example can be found [here](tests/PL/). It is better to create a directory for these frames. We have to make sure periodic boundary condition is removed from trajectory
 
 ```
 mkdir pdb_pro_lig
@@ -113,7 +113,7 @@ echo 24 24 | gmx trjconv -f md_0.xtc -s md_0.tpr -n index.ndx -o pdb_pro_lig/trj
 ```
 Here index group 24 is the Protein_Ligand complex while 1 is the protein and 13 is the ligand. You can use -dt option to reduce number of frames to calculate. We prefer to have at least 100-200 frames. Let's say we have 1000 frames (trjmol0.pdb, trjmol1.pdb, ... trjmol1000.pdb) extracted into a directory name of ./pdb_pro_lig/.
 ```
-bash run_deepQM.sh
+bash run_deepQM_PL.sh
 ```
 After running this command, it will create a csv file in the same directory of ./pdb_pro_lig/. This file includes all frames for each group and energy differences written in eVs without fitting coefficients.
 
@@ -131,7 +131,7 @@ In order to account for solvation terms, we need another MD simulation of free l
 
 #### step-1) LS simulation for LSinLS
 
-This part is already discussed in [LS simulation](https://github.com/otayfuroglu/deepQM#tutorial-1-ligand-solvation-free-energy-from-ligandwater-ls-simulations). Obtained result, which we call LSinLS from [this script](tests/LS/run_deepQM.sh) will be used in step-3.
+This part is already discussed in [LS simulation](tests/LS/). Obtained result, which we call LSinLS from [this script](tests/LS/run_deepQM_LS.sh) will be used in step-3.
 
 #### step-2) PLS simulation for LSinPLS
   
@@ -149,9 +149,12 @@ To reduce your system size, you can use following Gromacs trjorder command. But 
 -create trajectory of reduced system
 
 
+After reducing the system size, the rest is the same as LS simulations using [this script](tests/LS/run_deepQM_LS.sh). But this time we will call this LSinPLS that will be used in step-3.
 
-In the first run, you will still run the same script discussed in [LS simulation](https://github.com/otayfuroglu/deepQM#tutorial-1-ligand-solvation-free-energy-from-ligandwater-ls-simulations)
+#### step-3) PLS simulation for PLinPLS
 
- 
+Although, this part is mostly discussed in [PL simulation](tests/PL/), we have added another directory of [PLS simulation](tests/PLS/). The last line in the [script] (tests/PLS/run_deepQM_PLS.sh) will be modified to add two terms "-ls_in_ls" and "-ls_in_pls". We have added this script to reflect this modification.
+
+It will print the results in Summary.dat file.
  
 
