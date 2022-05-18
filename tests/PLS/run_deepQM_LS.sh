@@ -24,7 +24,7 @@ struct_dir=$(pwd)/pdb_pro_lig_sol
 # This tells what the base name of the pdb files are.
 # When the trajectory is extracted in to multiple files, the file name excluding the frame number is given here. 
 # (e.g. trjmol1.pdb, trjmol2.pdb,... basename=trjmol)
-namebase=trjmol
+namebase=pls
 
 # frame starting number for the basename (default=0).
 seq_start=0
