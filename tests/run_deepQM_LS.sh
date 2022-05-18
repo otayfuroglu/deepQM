@@ -17,7 +17,7 @@ n_procs=2
 model_list="ani2x dftd3"
 
 
-# struct_dir  # includes pdb files dir. NOTE, This directory path must entires as full path
+# struct_dir  # includes pdb files dir.
 struct_dir=/cta/users/otayfuroglu/workspace/deepQM/tests/pdb_pro_lig
 
 
@@ -26,7 +26,7 @@ namebase=trjmol
 
 
 # set sequence of start (default=0) pose sarting number
-# set sequence of end (default=1E6) pose ending number
+# set sequence of end (default=1001) pose ending number
 seq_start=0
 seq_end=1001
 
