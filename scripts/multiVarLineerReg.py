@@ -14,18 +14,23 @@ def genUniqRandomInt(rng, size):
     return rnd
 
 
-df = pd.read_csv("Bootsrtrap_MMLIE.csv")
+def calcRMSE(predictions, targets):
+    return np.sqrt(((predictions - targets) ** 2).mean())
+
+
+df = pd.read_csv("Bootsrtrap_ANID3LIE.csv")
 #  print(genUniqRandomInt(len(df), size=6))
 #  rnd = np.random.randint(len(df), size=6)
 #  print(len(np.unique(rnd)) == len(rnd))
 
-labels = ["Beta", "Alpha", "Gamma", "Predicted_val"]
+labels = ["Beta", "Alpha", "Gamma", "RMSE_train", "RMSE_test"]
 df_result = pd.DataFrame(columns=labels)
 
 b_values = []
 a_values = []
 g_values = []
-mean_predicted_values = []
+rmse_train_values = []
+rmse_test_values = []
 
 for _ in range(100):
     rnd = genUniqRandomInt(len(df), size=6)
@@ -46,21 +51,28 @@ for _ in range(100):
     regr = linear_model.LinearRegression()
     regr.fit(X_train, y_train)
     #
-    predictedLIE = regr.predict(X_test)
+    predictedLIE_train = regr.predict(X_train)
+    predictedLIE_test = regr.predict(X_test)
+
     b, a = regr.coef_
     g = regr.intercept_
-    y_mean = predictedLIE.mean()
+
+    rmse_train = calcRMSE(predictedLIE_train, y_train.to_numpy())
+    rmse_test = calcRMSE(predictedLIE_test, y_test.to_numpy())
 
     b_values += [b]
     a_values += [a]
     g_values += [g]
-    mean_predicted_values += [y_mean]
+    rmse_train_values += [ rmse_train ]
+    rmse_test_values += [ rmse_test ]
+
 
 df_result[labels[0]] = b_values
 df_result[labels[1]] = a_values
 df_result[labels[2]] = g_values
-df_result[labels[3]] = mean_predicted_values
+df_result[labels[3]] = rmse_train_values
+df_result[labels[4]] = rmse_test_values
 
 
 
-df_result.to_csv("reslut_Bootsrtrap_MMLIE.csv")
+df_result.to_csv("reslut_Bootsrtrap_ANID3LIE.csv")
