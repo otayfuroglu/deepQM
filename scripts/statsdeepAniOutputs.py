@@ -59,22 +59,22 @@ if __name__ == "__main__":
                 #  mean = values.mean()
 
                 #  print(method)
-                if method == "avg":
+                if method.lower() == "avg":
                     result_column_name = method + "_" + column_name
                     result = avg(values)
                     result = result * KT2KCAL # kcal/mol
 
-                elif method == "exp":
+                elif method.lower() == "exp":
                     result_column_name = method + "_" + column_name
                     result = exp(values)
                     result = result * KT2KCAL # kcal/mol
 
-                elif method == "jar":
+                elif method.lower().replace("-", "") == "ncexp":
                     result_column_name = method + "_" + column_name
                     result = jar(values)
                     result = result * KT2KCAL # kcal/mol
 
-                elif method == "cumu":
+                elif method.lower().replace("-", "") == "cuexp":
                     result_column_name = method + "_" + column_name
                     result = cumu(values)
                     result = result * KT2KCAL # kcal/mol
