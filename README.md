@@ -4,9 +4,12 @@ ANI_LIE is a new tool based on ANI-ML potentials applied on MD trajectories aimi
 Please see the documentation below
 
 # Cite us
-An accurate binding free energy method from end state MD simulations (just submitted)
+An accurate binding free energy method from end state MD simulations:
+Ebru Akkus, Omer Tayfuroglu, Muslum Yildiz, and Abdulkadir Kocak Journal of Chemical Information and Modeling 2022 62 (17),4095-4106
+DOI: 10.1021/acs.jcim.2c00601
 
-The performance of ANI-ML potentials for ligand n(H2O) interaction energies and estimation of hydration free energies from end-point MD simulations (under revision)
+The performance of ANI-ML potentials for ligand n(H2O) interaction energies and estimation of hydration free energies from end-point MD simulations:
+Temel, M., Tayfuroglu, O., Kocak, A., J. Comput. Chem. 2022, 1. https://doi.org/10.1002/jcc.27022
 
 # Requirements:
 - Conda with Python 3
