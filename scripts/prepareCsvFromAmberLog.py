@@ -54,7 +54,7 @@ def getSplitMethodBlock(blocks_dict):
                     fl_block.write(line.replace("\n", "")+",")
         fl_block.close()
 
-# usege example
+# usage example
 #python ../scripts/sampledWtihRange.py -csv_path example.csv 
 if __name__ == "__main__":
     blocks_dict = getBlocks(csv_path)
