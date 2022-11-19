@@ -27,5 +27,5 @@ if end_point == -1:
     end_point = "end"
 df.T.to_csv(f"from_{start_point}_to_{end_point}_by_{step_size}.csv", index=None)
 
-# usege example
+# usage example
 #python ../scripts/sampledWtihRange.py -csv_path 2A4F_fbf_energies.csv -start 0 -end 50 -step 5
