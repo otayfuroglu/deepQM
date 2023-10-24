@@ -15,7 +15,7 @@ Temel, M., Tayfuroglu, O., Kocak, A., J. Comput. Chem. 2022, 1. https://doi.org/
 - Conda with Python 3
 - ASE
 - PyTorch (>=0.4.1)
-- Torchani
+- Torchani (<=2.2)
 Note: We recommend using a GPU for training the neural networks.
 
 # Installation
