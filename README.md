@@ -32,6 +32,11 @@ git clone https://github.com/otayfuroglu/deepQM.git
 
 cp deepQM/tests/run_deepQM.sh <working-dir>
 ```
+# Downlaod ANI models
+```
+python -c "import torchani; torchani.models.ANI1x(...)"
+```
+
 # How To Use
 
 deepQM.py is the main pyhton script that does the calculations. It can be called from run_deepQM.sh file in which a set of parameters are predefined and can be customized according to the calculation type.
