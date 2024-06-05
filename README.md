@@ -32,7 +32,8 @@ git clone https://github.com/otayfuroglu/deepQM.git
 
 cp deepQM/tests/run_deepQM.sh <working-dir>
 ```
-# Downlaod ANI models
+
+Users must download ANI models calls following command
 ```
 python -c "import torchani; torchani.models.ANI1x(...)"
 ```
