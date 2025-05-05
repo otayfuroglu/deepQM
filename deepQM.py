@@ -31,6 +31,7 @@ parser = argparse.ArgumentParser(description="Give something ...")
 parser.add_argument("calcMode", type=str)
 parser.add_argument("n_procs", type=int)
 parser.add_argument("model_list", nargs='+', default=[], type=str)
+parser.add_argument("local_model_path", type=str)
 parser.add_argument("struct_dir", type=str)
 parser.add_argument("namebase", type=str, )
 parser.add_argument("seq_start", type=int, default=1)
@@ -59,7 +60,10 @@ def calcSPWithModel(calculator, mol):
     os.mkdir(workdir)
     os.chdir(workdir)
 
-    mol.set_calculator(calculator)
+    # cosider total charge for aimnet2 calculator
+    if calculator == "aimnet2":
+        calculator.set_charge(mol.get_charges().sum())
+    mol.calc = calculator
 
     # check atom type for ani2x
     #  atom_types = mol.get_chemical_symbols()
@@ -144,6 +148,15 @@ def load_calculators(model_names, device):
             sys.exit(1)
         else:
             models["g16"] = setG16Calculator()
+    if "aimnet2" in model_names:
+        from aimnet2calc import AIMNet2ASE
+        models["aimnet2"] = AIMNet2ASE('aimnet2')
+    if "nequip" in model_names:
+        from nequip.ase import NequIPCalculator
+
+        return NequIPCalculator.from_deployed_model(
+            model_path=nequip_model_path, device=device,)
+
     #  if "dftd4" in model_names:
 
     #      models["dftd4"] = getD4calc()
@@ -465,6 +478,7 @@ def runOptMultiMol(n_procs, thr_fmax):
 args = parser.parse_args()
 n_procs = args.n_procs
 model_names = args.model_list
+local_model_path = args.local_model_path
 structure_dir = args.struct_dir
 namebase = args.namebase
 seq_start = args.seq_start
@@ -506,3 +520,6 @@ if __name__ == "__main__":
         runOptMultiMol(n_procs, thr_fmax)
     elif args.calcMode == "opt_multi_mol":
         runOptMultiMol(n_procs, thr_fmax)
+
+    if "nequip" in model_list:
+        nequip_model_path = local_model_path
