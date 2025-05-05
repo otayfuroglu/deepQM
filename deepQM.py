@@ -521,5 +521,5 @@ if __name__ == "__main__":
     elif args.calcMode == "opt_multi_mol":
         runOptMultiMol(n_procs, thr_fmax)
 
-    if "nequip" in model_list:
+    if "nequip" in model_names:
         nequip_model_path = local_model_path
